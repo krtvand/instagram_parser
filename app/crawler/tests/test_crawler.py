@@ -18,7 +18,7 @@ class TestIndexPageParser(unittest.TestCase):
         POSTS_FILE = 'source_data/posts_from_index_page.json'
         self.response = fake_response_from_file(file_name=PAGE_SOURCE)
         self.shared_data = self._load_shared_data(SHARED_DATA_FILE)
-        self.posts = self._load_shared_data(POSTS_FILE)
+        self.new_posts = self._load_shared_data(POSTS_FILE)
 
     def _load_shared_data(self, file_name):
         if not file_name[0] == '/':
@@ -49,7 +49,7 @@ class TestIndexPageParser(unittest.TestCase):
         shared_data_as_dict = json.loads(self.shared_data)
         post_objects = get_post_objects(shared_data_as_dict)
         self.assertEqual(len(post_objects), POSTS_NUMBER_ON_MAIN_PAGE)
-        self.assertDictEqual(json.loads(self.posts)[0], post_objects[0])
+        self.assertDictEqual(json.loads(self.new_posts)[0], post_objects[0])
 
     def test_get_owner_id_list_from_post_list(self):
         EXPECTED_OWNERS = [
@@ -57,7 +57,7 @@ class TestIndexPageParser(unittest.TestCase):
             '329049773', '2137751105', '3014124104', '2773941655', '1497292555', '651318403',
             '1440226781', '558521835', '1356489834', '1442815924', '4797965638', '6231474342',
             '1967565848', '5544970385', '1175903498', '1410913241', '3688741311', '773536033']
-        posts = json.loads(self.posts)
+        posts = json.loads(self.new_posts)
         id_list = get_owner_ids_from_posts_list(posts)
         self.assertEqual(EXPECTED_OWNERS, id_list)
 
