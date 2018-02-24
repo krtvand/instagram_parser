@@ -2,9 +2,9 @@ import re
 
 import scrapy
 
-from app.crawler.crawler.data_extractor import (extract_shared_data,
-                                                get_post_objects,
-                                                get_owner_ids_from_posts_list)
+from instagram_parser.crawler.crawler.data_extractor import (extract_shared_data,
+                                                             get_post_objects,
+                                                             get_owner_ids_from_posts_list)
 
 
 class ExampleSpider(scrapy.Spider):

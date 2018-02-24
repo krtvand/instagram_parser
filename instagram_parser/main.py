@@ -1,6 +1,6 @@
 import scrapy
 from scrapy.crawler import CrawlerProcess
-from app.crawler.crawler.spiders.example import ExampleSpider
+from instagram_parser.crawler.crawler.spiders.example import ExampleSpider
 
 process = CrawlerProcess({'LOG_LEVEL': 'INFO'})
 
