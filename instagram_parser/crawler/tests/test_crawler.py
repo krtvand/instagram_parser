@@ -3,11 +3,13 @@ import os
 import re
 import json
 
-from scrapy.http import HtmlResponse, Request, Response
+from scrapy.http import HtmlResponse, Request
 
 from instagram_parser.crawler.crawler.data_extractor import (extract_shared_data,
                                                              get_post_objects,
-                                                             get_owner_ids_from_posts_list)
+                                                             get_owner_ids_from_posts_list,
+                                                             get_last_post_id,
+                                                             pagination_has_next_page)
 
 from instagram_parser.crawler.crawler.query_hash_extractor import (get_link_for_js_file_with_queryhash,
                                                                    get_queryhash_from_js_file)
@@ -21,6 +23,7 @@ class TestIndexPageParser(unittest.TestCase):
         POSTS_FILE = 'source_data/posts_from_index_page.json'
         self.response = fake_response_from_file(file_name=PAGE_SOURCE)
         self.shared_data = self._load_shared_data(SHARED_DATA_FILE)
+        self.shared_data_as_dict = json.loads(self.shared_data)
         self.new_posts = self._load_shared_data(POSTS_FILE)
 
     def _load_shared_data(self, file_name):
@@ -37,15 +40,6 @@ class TestIndexPageParser(unittest.TestCase):
         shared_data = extract_shared_data(self.response)
         self.assertTrue(isinstance(shared_data, dict))
         self.assertTrue('entry_data' in shared_data)
-        # self.assertIsNotNone(re.match(r'^\{.*\}$', shared_data))
-        # self.assertTrue(self._is_json(shared_data))
-
-    def _is_json(self, json_obj):
-        try:
-            json.loads(json_obj)
-        except Exception:
-            return None
-        return True
 
     def test_shared_data_content(self):
         POSTS_NUMBER_ON_MAIN_PAGE = 24
@@ -63,6 +57,18 @@ class TestIndexPageParser(unittest.TestCase):
         posts = json.loads(self.new_posts)
         id_list = get_owner_ids_from_posts_list(posts)
         self.assertEqual(EXPECTED_OWNERS, id_list)
+
+    def test_get_last_post_id(self):
+        EXPECTED_ID = '1718895412364831673'
+        last_post_id = get_last_post_id(self.shared_data_as_dict)
+        self.assertEqual(EXPECTED_ID, last_post_id)
+
+    def test_pagination_has_next_page(self):
+        EXPECTED = True
+        has_next_page = pagination_has_next_page(self.shared_data_as_dict)
+        self.assertEqual(EXPECTED, has_next_page)
+
+
 
 
 class TestQueryHashExtractor(unittest.TestCase):

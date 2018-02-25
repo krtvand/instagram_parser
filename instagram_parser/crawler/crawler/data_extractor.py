@@ -37,9 +37,27 @@ def _get_owner_id_from_post(post:dict) -> str:
 
     return owner_id
 
-def get_owner_ids_from_posts_list(post_list: list) -> str:
+def get_owner_ids_from_posts_list(post_list: list) -> list:
     result = []
     for post in post_list:
         result.append(_get_owner_id_from_post(post))
 
     return result
+
+def get_last_post_id(shared_data: dict) -> str:
+    try:
+        last_post_id = shared_data.get('entry_data', {}).get('LocationsPage', ).pop().get('location', {}).get('media', {}).get('page_info', {}).get('end_cursor')
+        if not last_post_id:
+            raise Exception
+    except Exception:
+        raise DataExtractorException('Can not get last post id (end_cursor) from shared_data')
+    return last_post_id
+
+def pagination_has_next_page(shared_data: dict) -> bool:
+    try:
+        pagination_has_next_page = shared_data.get('entry_data', {}).get('LocationsPage', ).pop().get('location', {}).get('media', {}).get('page_info', {}).get('has_next_page')
+        if pagination_has_next_page is None:
+            raise Exception
+    except Exception:
+        raise DataExtractorException('Can not get value for next_has_page attribute from shared_data')
+    return pagination_has_next_page
