@@ -1,4 +1,6 @@
 from urllib.parse import urlencode, urljoin
+import json
+from collections import OrderedDict
 
 import scrapy
 from scrapy import Request
@@ -37,7 +39,8 @@ class ExampleSpider(scrapy.Spider):
     def get_url_for_next_page(self, response: scrapy.http.Response, shared_data: dict) -> scrapy.http.Request:
         query_hash = self.get_query_hash(response)
         after = get_last_post_id(shared_data)
-        variables = '{{"id":"{}","first":{},"after":"{}"}}'.format(self.location_id, 12, after)
+        params_as_dict = OrderedDict([("id", self.location_id), ("first", 12), ("after", after)])
+        variables = json.dumps(params_as_dict).replace(' ', '')
         params = urlencode([('query_hash', query_hash), ('variables', variables)])
         url = urljoin(self.base_url, self.pagination_url) + '?' + params
 
