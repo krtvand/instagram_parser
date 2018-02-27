@@ -15,7 +15,6 @@ from instagram_parser.crawler.crawler.query_hash_extractor import (get_link_for_
 
 class ExampleSpider(scrapy.Spider):
     name = 'example'
-    # allowed_domains = ['example.com']
     location_id = '224829075'
     base_url = 'https://www.instagram.com'
     pagination_url = '/graphql/query/'
@@ -29,7 +28,8 @@ class ExampleSpider(scrapy.Spider):
         # pagination
         if pagination_has_next_page(shared_data):
             next_page_url = self.get_url_for_next_page(response, shared_data)
-            yield Request(next_page_url, meta={'owner_ids_list': owner_ids_list},
+            headers = {'x-requested-with': 'XMLHttpRequest'}
+            yield Request(next_page_url, headers=headers, meta={'owner_ids_list': owner_ids_list},
                           callback=self.parse_next_page)
         else:
             yield {'owner_ids_list': owner_ids_list}
@@ -37,10 +37,11 @@ class ExampleSpider(scrapy.Spider):
     def get_url_for_next_page(self, response: scrapy.http.Response, shared_data: dict) -> scrapy.http.Request:
         query_hash = self.get_query_hash(response)
         after = get_last_post_id(shared_data)
-        params = urlencode({'query_hash': query_hash,
-                            'variables': {"id": self.location_id, "first": 12, "after": after}})
+        variables = '{{"id":"{}","first":{},"after":"{}"}}'.format(self.location_id, 12, after)
+        params = urlencode([('query_hash', query_hash), ('variables', variables)])
+        url = urljoin(self.base_url, self.pagination_url) + '?' + params
 
-        return urljoin(self.base_url, self.pagination_url, params)
+        return url
 
     def get_query_hash(self, response: scrapy.http.Response):
         """

@@ -22,7 +22,7 @@ def extract_shared_data(response: scrapy.http.Response) -> dict:
 
 def get_post_objects(shared_data: dict) -> list:
     try:
-        posts_list = shared_data.get('entry_data', {}).get('LocationsPage', ).pop().get('location', {}).get('media', {}).get('nodes', [])
+        posts_list = shared_data.get('entry_data', {}).get('LocationsPage', )[0].get('location', {}).get('media', {}).get('nodes', [])
         if not posts_list:
             raise Exception
     except Exception:
@@ -46,7 +46,7 @@ def get_owner_ids_from_posts_list(post_list: list) -> list:
 
 def get_last_post_id(shared_data: dict) -> str:
     try:
-        last_post_id = shared_data.get('entry_data', {}).get('LocationsPage', ).pop().get('location', {}).get('media', {}).get('page_info', {}).get('end_cursor')
+        last_post_id = shared_data.get('entry_data', {}).get('LocationsPage', )[0].get('location', {}).get('media', {}).get('page_info', {}).get('end_cursor')
         if not last_post_id:
             raise Exception
     except Exception:
@@ -55,7 +55,7 @@ def get_last_post_id(shared_data: dict) -> str:
 
 def pagination_has_next_page(shared_data: dict) -> bool:
     try:
-        pagination_has_next_page = shared_data.get('entry_data', {}).get('LocationsPage', ).pop().get('location', {}).get('media', {}).get('page_info', {}).get('has_next_page')
+        pagination_has_next_page = shared_data.get('entry_data', {}).get('LocationsPage', )[0].get('location', {}).get('media', {}).get('page_info', {}).get('has_next_page')
         if pagination_has_next_page is None:
             raise Exception
     except Exception:
