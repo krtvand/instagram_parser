@@ -9,7 +9,9 @@ from instagram_parser.crawler.crawler.data_extractor import (extract_shared_data
                                                              get_post_objects,
                                                              get_owner_ids_from_posts_list,
                                                              get_last_post_id,
-                                                             pagination_has_next_page)
+                                                             pagination_has_next_page,
+                                                             extract_data_from_next_page,
+                                                             get_post_objects_from_next_page)
 
 from instagram_parser.crawler.crawler.query_hash_extractor import (get_link_for_js_file_with_queryhash,
                                                                    get_queryhash_from_js_source)
@@ -69,8 +71,6 @@ class TestIndexPageParser(unittest.TestCase):
         self.assertEqual(EXPECTED, has_next_page)
 
 
-
-
 class TestQueryHashExtractor(unittest.TestCase):
 
     def setUp(self):
@@ -127,4 +127,33 @@ def fake_response_from_file(file_name, url=None):
     return response
 
 
+class TestNextPageParser(unittest.TestCase):
 
+    def setUp(self):
+        NEXT_PAGE_SOURCE = 'source_data/instagram_publications_by_location_next_page.json'
+        NEXT_PAGE_POSTS = 'source_data/posts_from_next_page.json'
+        self.response = fake_response_from_file(file_name=NEXT_PAGE_SOURCE)
+        self.next_page_data_str = self._load_shared_data(NEXT_PAGE_SOURCE)
+        self.next_page_data_as_dict = json.loads(self.next_page_data_str)
+        self.new_posts = self._load_shared_data(NEXT_PAGE_POSTS)
+
+    def _load_shared_data(self, file_name):
+        if not file_name[0] == '/':
+            responses_dir = os.path.dirname(os.path.realpath(__file__))
+            file_path = os.path.join(responses_dir, file_name)
+        else:
+            file_path = file_name
+        with open(file_path, 'r') as f:
+            file_content = f.read()
+            return file_content
+
+    def test_extract_data_from_next_page(self):
+        next_page_data_dict = extract_data_from_next_page(self.response)
+        self.assertTrue(isinstance(next_page_data_dict, dict))
+        self.assertTrue('data' in next_page_data_dict)
+
+    def test_get_post_objects_from_next_page(self):
+        POSTS_NUMBER_FROM_NEXT_PAGE = 12
+        post_objects = get_post_objects_from_next_page(self.next_page_data_as_dict)
+        self.assertEqual(len(post_objects), POSTS_NUMBER_FROM_NEXT_PAGE)
+        self.assertDictEqual(json.loads(self.new_posts)[0], post_objects[0])

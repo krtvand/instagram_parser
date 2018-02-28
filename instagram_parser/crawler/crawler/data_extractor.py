@@ -11,14 +11,22 @@ class DataExtractorException(Exception):
 
 
 def extract_shared_data(response: scrapy.http.Response) -> dict:
-    """Вся информация о публикациях находится в json объекте в исходном коде страницы.
-
+    """
+    Вся информация о публикациях находится в json объекте в исходном коде страницы.
     """
     elem_with_shared_data = response.xpath('//body/script[starts-with(text(), "window._sharedData")]/text()').extract_first()
     shared_data_str = re.sub(r'(.*?)(\{.*\})(.*)', r'\2', elem_with_shared_data)
     shared_data_dict = json.loads(shared_data_str)
 
     return shared_data_dict
+
+def extract_data_from_next_page(response: scrapy.http.Response) -> dict:
+    """
+    Следующая страница при пагинации запрашивается через ajax запрос и в ответ приходит чистый json
+    """
+    next_page__data_as_dict = json.loads(response.text)
+
+    return next_page__data_as_dict
 
 def get_post_objects(shared_data: dict) -> list:
     try:
@@ -29,6 +37,18 @@ def get_post_objects(shared_data: dict) -> list:
         raise DataExtractorException('Can not get nodes (posts) from shared_data')
 
     return posts_list
+
+def get_post_objects_from_next_page(shared_data: dict) -> list:
+    return []
+    try:
+        posts_list = shared_data.get('entry_data', {}).get('LocationsPage', )[0].get('location', {}).get('media', {}).get('nodes', [])
+        if not posts_list:
+            raise Exception
+    except Exception:
+        raise DataExtractorException('Can not get nodes (posts) from shared_data')
+
+    return posts_list
+
 
 def _get_owner_id_from_post(post:dict) -> str:
     owner_id = post.get('owner', {}).get('id')
