@@ -128,7 +128,7 @@ class NextPageParser(LocationPageParser):
         return posts_list
 
     def get_owner_id_from_post(self, post: dict) -> str:
-        owner_id = _get_owner_id_from_next_page_post(post)
+        owner_id = post.get('node', {}).get('owner', {}).get('id')
         if not owner_id:
             raise DataExtractorException('Can not get owner id from post')
         return owner_id
@@ -163,75 +163,6 @@ class Pagination:
         Проверка пагинации на предмет наличия следующей страницы
         """
         raise NotImplementedError
-
-
-def extract_data_from_next_page(response: scrapy.http.Response) -> dict:
-    """
-    Следующая страница при пагинации запрашивается через ajax запрос и в ответ приходит чистый json
-    """
-    next_page__data_as_dict = json.loads(response.text)
-
-    return next_page__data_as_dict
-
-def get_post_objects(shared_data: dict) -> list:
-    try:
-        posts_list = shared_data.get('entry_data', {}).get('LocationsPage')[0].get('location', {}).get('media', {}).get('nodes', [])
-        if not posts_list:
-            raise Exception
-    except Exception:
-        raise DataExtractorException('Can not get nodes (posts) from shared_data')
-
-    return posts_list
-
-def get_post_objects_from_next_page(shared_data: dict) -> list:
-    try:
-        posts_list = shared_data.get('data', {}).get('location', {}).get('edge_location_to_media', {}).get('edges', [])
-        if not posts_list:
-            raise Exception
-    except Exception:
-        raise DataExtractorException('Can not get posts from next_page')
-
-    return posts_list
-
-
-def _get_owner_id_from_post(post: dict) -> str:
-    owner_id = post.get('owner', {}).get('id')
-    if not owner_id:
-        raise DataExtractorException('Can not get owner id from post')
-
-    return owner_id
-
-def get_owner_ids_from_posts_list(post_list: list) -> list:
-    result = []
-    for post in post_list:
-        result.append(_get_owner_id_from_post(post))
-
-    return result
-
-def _get_owner_id_from_next_page_post(post: dict) -> str:
-    owner_id = post.get('node', {}).get('owner', {}).get('id')
-    if not owner_id:
-        raise DataExtractorException('Can not get owner id from post')
-
-    return owner_id
-
-def collect_data_from_next_page_post(post: dict) -> dict:
-    post_id = post.get('node', {}).get('id')
-    owner_id = _get_owner_id_from_next_page_post(post)
-    shortcode = post.get('node', {}).get('shortcode')
-    if not all([post_id, owner_id, shortcode]):
-        raise DataExtractorException('Can not get data from post')
-
-    return {'post_id': post_id, 'owner_id': owner_id, 'shortcode': shortcode}
-
-def collect_data_from_post(post: dict) -> dict:
-    post_id = post.get('id')
-    owner_id = _get_owner_id_from_post(post)
-    shortcode = post.get('code')
-    if not all([post_id, owner_id, shortcode]):
-        raise DataExtractorException('Can not get data from post')
-
-    return {'post_id': post_id, 'owner_id': owner_id, 'shortcode': shortcode}
 
 def get_last_post_id(shared_data: dict) -> str:
     try:

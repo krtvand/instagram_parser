@@ -6,12 +6,8 @@ import json
 from scrapy.http import HtmlResponse, Request
 
 from instagram_parser.crawler.crawler.data_extractor import (
-                                                             get_owner_ids_from_posts_list,
                                                              get_last_post_id,
                                                              pagination_has_next_page,
-                                                             extract_data_from_next_page,
-                                                             get_post_objects_from_next_page,
-                                                             collect_data_from_next_page_post,
                                                              NextPageParser,
                                                              FirstPageParser)
 
@@ -52,16 +48,6 @@ class TestIndexPageParser(unittest.TestCase):
         post_objects = self.parser.get_post_objects(shared_data_as_dict)
         self.assertEqual(len(post_objects), POSTS_NUMBER_ON_MAIN_PAGE)
         self.assertDictEqual(json.loads(self.new_posts)[0], post_objects[0])
-
-    def test_get_owner_id_list_from_post_list(self):
-        EXPECTED_OWNERS = [
-            '2085484199', '1231966111', '1417245904', '284839646', '802691449', '530212866',
-            '329049773', '2137751105', '3014124104', '2773941655', '1497292555', '651318403',
-            '1440226781', '558521835', '1356489834', '1442815924', '4797965638', '6231474342',
-            '1967565848', '5544970385', '1175903498', '1410913241', '3688741311', '773536033']
-        posts = json.loads(self.new_posts)
-        id_list = get_owner_ids_from_posts_list(posts)
-        self.assertEqual(EXPECTED_OWNERS, id_list)
 
     def test_get_last_post_id(self):
         EXPECTED_ID = '1718895412364831673'

@@ -6,9 +6,7 @@ import scrapy
 from scrapy import Request
 import requests
 
-from instagram_parser.crawler.crawler.data_extractor import (get_post_objects,
-                                                             get_owner_ids_from_posts_list,
-                                                             get_last_post_id,
+from instagram_parser.crawler.crawler.data_extractor import (get_last_post_id,
                                                              pagination_has_next_page,
                                                              FirstPageParser)
 from instagram_parser.crawler.crawler.query_hash_extractor import (get_link_for_js_file_with_queryhash,
