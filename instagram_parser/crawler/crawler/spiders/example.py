@@ -6,11 +6,11 @@ import scrapy
 from scrapy import Request
 import requests
 
-from instagram_parser.crawler.crawler.data_extractor import (extract_shared_data,
-                                                             get_post_objects,
+from instagram_parser.crawler.crawler.data_extractor import (get_post_objects,
                                                              get_owner_ids_from_posts_list,
                                                              get_last_post_id,
-                                                             pagination_has_next_page)
+                                                             pagination_has_next_page,
+                                                             FirstPageParser)
 from instagram_parser.crawler.crawler.query_hash_extractor import (get_link_for_js_file_with_queryhash,
                                                                    get_queryhash_from_js_source)
 
@@ -21,9 +21,10 @@ class ExampleSpider(scrapy.Spider):
     base_url = 'https://www.instagram.com'
     pagination_url = '/graphql/query/'
     start_urls = ['{}/explore/locations/{}/'.format(base_url, location_id)]
+    index_page_parser = FirstPageParser()
 
     def parse(self, response):
-        shared_data = extract_shared_data(response)
+        shared_data = self.index_page_parser.extract_shared_data(response)
         posts_list = get_post_objects(shared_data)
         owner_ids_list = get_owner_ids_from_posts_list(posts_list)
 

@@ -9,16 +9,63 @@ class DataExtractorException(Exception):
     Например не найден необходимый елемент.
     """
 
+class LocationPageParser:
+    def extract_shared_data(self, response: scrapy.http.Response) -> dict:
+        """Получаем shared_data как dict
 
-def extract_shared_data(response: scrapy.http.Response) -> dict:
-    """
-    Вся информация о публикациях находится в json объекте в исходном коде страницы.
-    """
-    elem_with_shared_data = response.xpath('//body/script[starts-with(text(), "window._sharedData")]/text()').extract_first()
-    shared_data_str = re.sub(r'(.*?)(\{.*\})(.*)', r'\2', elem_with_shared_data)
-    shared_data_dict = json.loads(shared_data_str)
+        shared_data - это json объект из исходного кода страницы, который содержит всю
+        информацию о постах, пагинации и т.д.
+        """
+        raise NotImplementedError
 
-    return shared_data_dict
+    def get_post_objects(self, shared_data: dict) -> list:
+        """
+        Получение списка словарей с информацией о постах из shared_data объекта
+        """
+        raise NotImplementedError
+
+    def collect_data_from_post(self, post: dict) -> dict:
+        """
+        Сбор необъодимой информации из поста
+        """
+        raise NotImplementedError
+
+
+class FirstPageParser(LocationPageParser):
+    """
+    Парсинг индексной (первой) страницы с постами
+    """
+
+    def extract_shared_data(self, response: scrapy.http.Response) -> dict:
+        """
+        Вся информация о публикациях находится в json объекте в исходном коде страницы.
+        """
+        elem_with_shared_data = response.xpath('//body/script[starts-with(text(), "window._sharedData")]/text()').extract_first()
+        shared_data_str = re.sub(r'(.*?)(\{.*\})(.*)', r'\2', elem_with_shared_data)
+        shared_data_dict = json.loads(shared_data_str)
+
+        return shared_data_dict
+
+
+class Pagination:
+    """
+    Пагинация
+    """
+
+    def get_last_post_id(shared_data: dict) -> str:
+        """
+        Получение id последнего поста на текущей странице, для того, чтобы сформировать
+        запрос на следующую страниццу в пагинации
+        """
+        raise NotImplementedError
+
+    def pagination_has_next_page(shared_data: dict) -> bool:
+        """
+        Проверка пагинации на предмет наличия следующей страницы
+        """
+        raise NotImplementedError
+
+
 
 def extract_data_from_next_page(response: scrapy.http.Response) -> dict:
     """
@@ -73,8 +120,20 @@ def _get_owner_id_from_next_page_post(post: dict) -> str:
 def collect_data_from_next_page_post(post: dict) -> dict:
     post_id = post.get('node', {}).get('id')
     owner_id = _get_owner_id_from_next_page_post(post)
+    shortcode = post.get('node', {}).get('shortcode')
+    if not all([post_id, owner_id, shortcode]):
+        raise DataExtractorException('Can not get data from post')
 
-    return {'post_id': post_id, 'owner_id': owner_id}
+    return {'post_id': post_id, 'owner_id': owner_id, 'shortcode': shortcode}
+
+def collect_data_from_post(post: dict) -> dict:
+    post_id = post.get('id')
+    owner_id = _get_owner_id_from_post(post)
+    shortcode = post.get('code')
+    if not all([post_id, owner_id, shortcode]):
+        raise DataExtractorException('Can not get data from post')
+
+    return {'post_id': post_id, 'owner_id': owner_id, 'shortcode': shortcode}
 
 def get_last_post_id(shared_data: dict) -> str:
     try:
