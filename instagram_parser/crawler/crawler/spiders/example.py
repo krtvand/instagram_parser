@@ -24,18 +24,20 @@ class ExampleSpider(scrapy.Spider):
     index_page_parser = FirstPageParser()
 
     def parse(self, response):
+        posts_info = []
         shared_data = self.index_page_parser.extract_shared_data(response)
-        posts_list = get_post_objects(shared_data)
-        owner_ids_list = get_owner_ids_from_posts_list(posts_list)
+        posts_list = self.index_page_parser.get_post_objects(shared_data)
+        for post in posts_list:
+            posts_info.append(self.index_page_parser.collect_data_from_post(post))
 
         # pagination
         if pagination_has_next_page(shared_data):
             next_page_url = self.get_url_for_next_page(response, shared_data)
             headers = {'x-requested-with': 'XMLHttpRequest'}
-            yield Request(next_page_url, headers=headers, meta={'owner_ids_list': owner_ids_list},
+            yield Request(next_page_url, headers=headers, meta={'posts_info': posts_info},
                           callback=self.parse_next_page)
         else:
-            yield {'owner_ids_list': owner_ids_list}
+            yield {'posts_info': posts_info}
 
     def get_url_for_next_page(self, response: scrapy.http.Response, shared_data: dict) -> scrapy.http.Request:
         query_hash = self.get_query_hash(response)
@@ -62,4 +64,6 @@ class ExampleSpider(scrapy.Spider):
         with open('next_page', 'w') as f:
             f.write(response.text)
 
-        yield response.request.meta['owner_ids_list']
+
+        posts_info = response.request.meta['posts_info']
+        yield {'posts_info': posts_info}

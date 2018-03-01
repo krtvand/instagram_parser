@@ -5,14 +5,14 @@ import json
 
 from scrapy.http import HtmlResponse, Request
 
-from instagram_parser.crawler.crawler.data_extractor import (get_post_objects,
+from instagram_parser.crawler.crawler.data_extractor import (
                                                              get_owner_ids_from_posts_list,
                                                              get_last_post_id,
                                                              pagination_has_next_page,
                                                              extract_data_from_next_page,
                                                              get_post_objects_from_next_page,
                                                              collect_data_from_next_page_post,
-                                                             collect_data_from_post,
+                                                             NextPageParser,
                                                              FirstPageParser)
 
 from instagram_parser.crawler.crawler.query_hash_extractor import (get_link_for_js_file_with_queryhash,
@@ -46,10 +46,10 @@ class TestIndexPageParser(unittest.TestCase):
         self.assertTrue(isinstance(shared_data, dict))
         self.assertTrue('entry_data' in shared_data)
 
-    def test_shared_data_content(self):
+    def test_get_post_objects(self):
         POSTS_NUMBER_ON_MAIN_PAGE = 24
         shared_data_as_dict = json.loads(self.shared_data)
-        post_objects = get_post_objects(shared_data_as_dict)
+        post_objects = self.parser.get_post_objects(shared_data_as_dict)
         self.assertEqual(len(post_objects), POSTS_NUMBER_ON_MAIN_PAGE)
         self.assertDictEqual(json.loads(self.new_posts)[0], post_objects[0])
 
@@ -75,7 +75,7 @@ class TestIndexPageParser(unittest.TestCase):
             'shortcode': 'BfgYhAZF1wt'
         }
         post = json.loads(self.new_posts)[0]
-        data = collect_data_from_post(post)
+        data = self.parser.collect_data_from_post(post)
         self.assertDictEqual(expected_data, data)
 
     def test_pagination_has_next_page(self):
@@ -149,6 +149,7 @@ class TestNextPageParser(unittest.TestCase):
         self.next_page_data_str = self._load_shared_data(NEXT_PAGE_SOURCE)
         self.next_page_data_as_dict = json.loads(self.next_page_data_str)
         self.new_posts = self._load_shared_data(NEXT_PAGE_POSTS)
+        self.parser = NextPageParser()
 
     def _load_shared_data(self, file_name):
         if not file_name[0] == '/':
@@ -161,13 +162,13 @@ class TestNextPageParser(unittest.TestCase):
             return file_content
 
     def test_extract_data_from_next_page(self):
-        next_page_data_dict = extract_data_from_next_page(self.response)
+        next_page_data_dict = self.parser.extract_shared_data(self.response)
         self.assertTrue(isinstance(next_page_data_dict, dict))
         self.assertTrue('data' in next_page_data_dict)
 
-    def test_get_post_objects_from_next_page(self):
+    def test_get_post_objects(self):
         POSTS_NUMBER_FROM_NEXT_PAGE = 12
-        post_objects = get_post_objects_from_next_page(self.next_page_data_as_dict)
+        post_objects = self.parser.get_post_objects(self.next_page_data_as_dict)
         self.assertEqual(len(post_objects), POSTS_NUMBER_FROM_NEXT_PAGE)
         self.assertDictEqual(json.loads(self.new_posts)[0], post_objects[0])
 
@@ -178,5 +179,5 @@ class TestNextPageParser(unittest.TestCase):
             'shortcode': 'Bfakwh5BXyk'
         }
         post = json.loads(self.new_posts)[0]
-        data = collect_data_from_next_page_post(post)
+        data = self.parser.collect_data_from_post(post)
         self.assertDictEqual(expected_data, data)
