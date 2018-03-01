@@ -11,7 +11,8 @@ from instagram_parser.crawler.crawler.data_extractor import (extract_shared_data
                                                              get_last_post_id,
                                                              pagination_has_next_page,
                                                              extract_data_from_next_page,
-                                                             get_post_objects_from_next_page)
+                                                             get_post_objects_from_next_page,
+                                                             collect_data_from_next_page_post)
 
 from instagram_parser.crawler.crawler.query_hash_extractor import (get_link_for_js_file_with_queryhash,
                                                                    get_queryhash_from_js_source)
@@ -157,3 +158,9 @@ class TestNextPageParser(unittest.TestCase):
         post_objects = get_post_objects_from_next_page(self.next_page_data_as_dict)
         self.assertEqual(len(post_objects), POSTS_NUMBER_FROM_NEXT_PAGE)
         self.assertDictEqual(json.loads(self.new_posts)[0], post_objects[0])
+
+    def test_collect_data_from_post(self):
+        expected_data = {'post_id': '1718847872394689700', 'owner_id': '1156705436'}
+        post = json.loads(self.new_posts)[0]
+        data = collect_data_from_next_page_post(post)
+        self.assertDictEqual(expected_data, data)
