@@ -5,15 +5,8 @@ import json
 
 from scrapy.http import HtmlResponse, Request
 
-from instagram_parser.crawler.crawler.data_extractor import (
-                                                             get_last_post_id,
-                                                             pagination_has_next_page,
-                                                             NextPageParser,
+from instagram_parser.crawler.crawler.data_extractor import (NextPageParser,
                                                              FirstPageParser)
-
-from instagram_parser.crawler.crawler.query_hash_extractor import (get_link_for_js_file_with_queryhash,
-                                                                   get_queryhash_from_js_source)
-
 
 class TestIndexPageParser(unittest.TestCase):
 
@@ -49,11 +42,6 @@ class TestIndexPageParser(unittest.TestCase):
         self.assertEqual(len(post_objects), POSTS_NUMBER_ON_MAIN_PAGE)
         self.assertDictEqual(json.loads(self.new_posts)[0], post_objects[0])
 
-    def test_get_last_post_id(self):
-        EXPECTED_ID = '1718895412364831673'
-        last_post_id = get_last_post_id(self.shared_data_as_dict)
-        self.assertEqual(EXPECTED_ID, last_post_id)
-
     def test_collect_data_from_post(self):
         expected_data = {
             'post_id': '1720482878935489581',
@@ -63,41 +51,6 @@ class TestIndexPageParser(unittest.TestCase):
         post = json.loads(self.new_posts)[0]
         data = self.parser.collect_data_from_post(post)
         self.assertDictEqual(expected_data, data)
-
-    def test_pagination_has_next_page(self):
-        EXPECTED = True
-        has_next_page = pagination_has_next_page(self.shared_data_as_dict)
-        self.assertEqual(EXPECTED, has_next_page)
-
-
-class TestQueryHashExtractor(unittest.TestCase):
-
-    def setUp(self):
-        PAGE_SOURCE = 'source_data/instagram_publications_by_location.html'
-        JS_FILE_WITH_QUERYHASH = 'source_data/LocationPageContainer.js'
-        self.response = fake_response_from_file(file_name=PAGE_SOURCE)
-        self.response_for_js_with_queryhash = fake_response_from_file(file_name=JS_FILE_WITH_QUERYHASH)
-        self.source_of_js_with_queryhash = self._load_shared_data(JS_FILE_WITH_QUERYHASH)
-
-    def _load_shared_data(self, file_name):
-        if not file_name[0] == '/':
-            responses_dir = os.path.dirname(os.path.realpath(__file__))
-            file_path = os.path.join(responses_dir, file_name)
-        else:
-            file_path = file_name
-        with open(file_path, 'r') as f:
-            file_content = f.read()
-            return file_content
-
-    def test_get_link_for_js_file_with_queryhash(self):
-        link = get_link_for_js_file_with_queryhash(self.response)
-        self.assertTrue(isinstance(link, str))
-        self.assertEqual("/static/bundles/LocationPageContainer.js/0a8e5b85842a.js", link)
-
-    def test_get_queryhash_from_js_file(self):
-        EXPECTED_QUERYHASH = '951c979213d7e7a1cf1d73e2f661cbd1'
-        query_hash = get_queryhash_from_js_source(self.source_of_js_with_queryhash)
-        self.assertEqual(EXPECTED_QUERYHASH, query_hash)
 
 
 def fake_response_from_file(file_name, url=None):

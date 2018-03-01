@@ -3,6 +3,7 @@ import json
 
 import scrapy
 
+
 class DataExtractorException(Exception):
     """
     Исключение при проблемах сбора информации со страницы сайта.
@@ -145,24 +146,6 @@ class NextPageParser(LocationPageParser):
             raise DataExtractorException('Can not get shortcode from post')
         return shortcode
 
-
-class Pagination:
-    """
-    Пагинация
-    """
-
-    def get_last_post_id(shared_data: dict) -> str:
-        """
-        Получение id последнего поста на текущей странице, для того, чтобы сформировать
-        запрос на следующую страниццу в пагинации
-        """
-        raise NotImplementedError
-
-    def pagination_has_next_page(shared_data: dict) -> bool:
-        """
-        Проверка пагинации на предмет наличия следующей страницы
-        """
-        raise NotImplementedError
 
 def get_last_post_id(shared_data: dict) -> str:
     try:

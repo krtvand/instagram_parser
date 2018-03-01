@@ -6,9 +6,8 @@ import scrapy
 from scrapy import Request
 import requests
 
-from instagram_parser.crawler.crawler.data_extractor import (get_last_post_id,
-                                                             pagination_has_next_page,
-                                                             FirstPageParser)
+from instagram_parser.crawler.crawler.pagination import (PaginatorInFirstPage,)
+from instagram_parser.crawler.crawler.data_extractor import (FirstPageParser)
 from instagram_parser.crawler.crawler.query_hash_extractor import (get_link_for_js_file_with_queryhash,
                                                                    get_queryhash_from_js_source)
 
@@ -20,6 +19,7 @@ class ExampleSpider(scrapy.Spider):
     pagination_url = '/graphql/query/'
     start_urls = ['{}/explore/locations/{}/'.format(base_url, location_id)]
     index_page_parser = FirstPageParser()
+    index_page_paginator = PaginatorInFirstPage(base_url, location_id)
 
     def parse(self, response):
         posts_info = []
@@ -29,7 +29,7 @@ class ExampleSpider(scrapy.Spider):
             posts_info.append(self.index_page_parser.collect_data_from_post(post))
 
         # pagination
-        if pagination_has_next_page(shared_data):
+        if self.index_page_paginator.pagination_has_next_page(shared_data):
             next_page_url = self.get_url_for_next_page(response, shared_data)
             headers = {'x-requested-with': 'XMLHttpRequest'}
             yield Request(next_page_url, headers=headers, meta={'posts_info': posts_info},
@@ -39,7 +39,7 @@ class ExampleSpider(scrapy.Spider):
 
     def get_url_for_next_page(self, response: scrapy.http.Response, shared_data: dict) -> scrapy.http.Request:
         query_hash = self.get_query_hash(response)
-        after = get_last_post_id(shared_data)
+        after = self.index_page_paginator.get_last_post_id(shared_data)
         params_as_dict = OrderedDict([("id", self.location_id), ("first", 12), ("after", after)])
         variables = json.dumps(params_as_dict).replace(' ', '')
         params = urlencode([('query_hash', query_hash), ('variables', variables)])
