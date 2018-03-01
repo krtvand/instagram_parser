@@ -1,15 +1,8 @@
-from urllib.parse import urlencode, urljoin
-import json
-from collections import OrderedDict
-
 import scrapy
 from scrapy import Request
-import requests
 
 from instagram_parser.crawler.crawler.pagination import (PaginatorInFirstPage,)
 from instagram_parser.crawler.crawler.data_extractor import (FirstPageParser)
-from instagram_parser.crawler.crawler.query_hash_extractor import (get_link_for_js_file_with_queryhash,
-                                                                   get_queryhash_from_js_source)
 
 
 class ExampleSpider(scrapy.Spider):
@@ -30,33 +23,12 @@ class ExampleSpider(scrapy.Spider):
 
         # pagination
         if self.index_page_paginator.pagination_has_next_page(shared_data):
-            next_page_url = self.get_url_for_next_page(response, shared_data)
+            next_page_url = self.index_page_paginator.get_url_for_next_page(response, shared_data)
             headers = {'x-requested-with': 'XMLHttpRequest'}
             yield Request(next_page_url, headers=headers, meta={'posts_info': posts_info},
                           callback=self.parse_next_page)
         else:
             yield {'posts_info': posts_info}
-
-    def get_url_for_next_page(self, response: scrapy.http.Response, shared_data: dict) -> scrapy.http.Request:
-        query_hash = self.get_query_hash(response)
-        after = self.index_page_paginator.get_last_post_id(shared_data)
-        params_as_dict = OrderedDict([("id", self.location_id), ("first", 12), ("after", after)])
-        variables = json.dumps(params_as_dict).replace(' ', '')
-        params = urlencode([('query_hash', query_hash), ('variables', variables)])
-        url = urljoin(self.base_url, self.pagination_url) + '?' + params
-
-        return url
-
-    def get_query_hash(self, response: scrapy.http.Response):
-        """
-        :param response: индексная страница для постов в заданной локации
-        :return:
-        """
-        js_relative_url = get_link_for_js_file_with_queryhash(response)
-        js_with_query_hash = requests.get(urljoin(self.base_url, js_relative_url))
-        query_hash = get_queryhash_from_js_source(js_with_query_hash.text)
-
-        return query_hash
 
     def parse_next_page(self, response):
         with open('next_page', 'w') as f:

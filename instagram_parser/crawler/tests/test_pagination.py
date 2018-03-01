@@ -26,7 +26,6 @@ class TestPaginatorBase:
             return file_content
 
 
-
 class TestPaginator(TestPaginatorBase, unittest.TestCase):
 
     def setUp(self):
@@ -62,12 +61,12 @@ class TestPaginator(TestPaginatorBase, unittest.TestCase):
         url = spider.get_url_for_next_page(self.response, self.shared_data_as_dict)
         self.assertEqual(expected_url, url)
 
-    def test_get_relative_link_for_js_file_with_queryhash(self):
+    def test_get_link_for_js_file_with_queryhash(self):
         link = self.paginator.get_link_for_js_file_with_queryhash(self.response)
         self.assertTrue(isinstance(link, str))
         self.assertEqual("/static/bundles/LocationPageContainer.js/0a8e5b85842a.js", link)
 
-    def test_get_queryhash_from_js_file(self):
+    def test_get_queryhash_from_js_source(self):
         EXPECTED_QUERYHASH = '951c979213d7e7a1cf1d73e2f661cbd1'
         query_hash = self.paginator.get_queryhash_from_js_source(self.source_of_js_with_queryhash)
         self.assertEqual(EXPECTED_QUERYHASH, query_hash)
