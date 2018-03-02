@@ -6,5 +6,5 @@ process = CrawlerProcess(
     {'LOG_LEVEL': 'INFO', 'FEED_URI': 'result.json', 'FEED_FORMAT': 'json'}
 )
 
-process.crawl(ExampleSpider)
+process.crawl(ExampleSpider, spider_stopper=lambda x: True)
 process.start() # the script will block here until the crawling is finished

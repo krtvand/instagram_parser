@@ -17,6 +17,11 @@ class ExampleSpider(scrapy.Spider):
     paginator = None
     page_parser = None
 
+    def __init__(self, spider_stopper, *args, **kwargs):
+        self.spider_stoper = spider_stopper
+
+        super().__init__(*args, **kwargs)
+
     def set_paginator(self, paginator_type):
         paginators = {
             'index_page_paginator': PaginatorInFirstPage(self.base_url, self.location_id),
