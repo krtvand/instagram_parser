@@ -36,7 +36,11 @@ class Paginator:
 
     def get_url_for_next_page(self, response: scrapy.http.Response,
                               shared_data: dict) -> scrapy.http.Request:
-        query_hash = self.get_query_hash(response)
+        if 'query_hash' not in response.request.meta:
+            query_hash = self.get_query_hash(response)
+            response.request.meta['query_hash'] = query_hash
+        else:
+            query_hash = response.request.meta['query_hash']
         after = self.get_last_post_id(shared_data)
         params_as_dict = OrderedDict([("id", self.location_id), ("first", 12), ("after", after)])
         variables = json.dumps(params_as_dict).replace(' ', '')
