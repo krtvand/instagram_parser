@@ -3,7 +3,7 @@ from scrapy import Request
 
 from instagram_parser.crawler.crawler.pagination import (Paginator, PaginatorInFirstPage, PaginatorInNextPage)
 from instagram_parser.crawler.crawler.data_extractor import (FirstPageParser, NextPageParser)
-
+from instagram_parser.crawler.crawler.spider_stopper import SpiderStopper
 
 class ExampleSpider(scrapy.Spider):
     name = 'example'
@@ -17,7 +17,7 @@ class ExampleSpider(scrapy.Spider):
     paginator = None
     page_parser = None
 
-    def __init__(self, spider_stopper, *args, **kwargs):
+    def __init__(self, spider_stopper: SpiderStopper, *args, **kwargs):
         self.spider_stoper = spider_stopper
 
         super().__init__(*args, **kwargs)
@@ -43,6 +43,8 @@ class ExampleSpider(scrapy.Spider):
         posts_list = self.page_parser.get_post_objects(shared_data)
         for post in posts_list:
             self.posts_info.append(self.page_parser.collect_data_from_post(post))
+        if self.spider_stoper.should_we_stop_spider(self.posts_info):
+            yield {'posts_info': self.posts_info}
 
         # pagination
         if self.paginator.pagination_has_next_page(shared_data):
@@ -60,13 +62,15 @@ class ExampleSpider(scrapy.Spider):
         posts_list = self.page_parser.get_post_objects(shared_data)
         for post in posts_list:
             self.posts_info.append(self.page_parser.collect_data_from_post(post))
+        if self.spider_stoper.should_we_stop_spider(self.posts_info):
+            yield {'posts_info': self.posts_info}
 
         # pagination
         if self.paginator.pagination_has_next_page(shared_data):
             next_page_url = self.paginator.get_url_for_next_page(response, shared_data)
             headers = {'x-requested-with': 'XMLHttpRequest'}
             meta = response.request.meta
-            yield Request(next_page_url, headers=headers, meta=meta, callback=self.end)
+            yield Request(next_page_url, headers=headers, meta=meta, callback=self.parse_next_page)
         else:
             yield {'posts_info': self.posts_info}
 
