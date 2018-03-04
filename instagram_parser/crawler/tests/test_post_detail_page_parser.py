@@ -30,3 +30,11 @@ class TestIndexPageParser(unittest.TestCase):
         post_owner_username = self.parser.get_owner_username(self.page_data_as_dict)
         expected = 'etsu_real'
         self.assertEqual(expected, post_owner_username)
+
+    def test_collect_data_from_post(self):
+        expected = {
+            'post_id': '1724081323683765859',
+            'owner_username': 'etsu_real',
+        }
+        post_info = self.parser.collect_data_from_post(self.page_data_as_dict)
+        self.assertEqual(expected, post_info)

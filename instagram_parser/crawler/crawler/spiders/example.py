@@ -7,6 +7,7 @@ from scrapy.exceptions import CloseSpider
 from instagram_parser.crawler.crawler.pagination import (Paginator, PaginatorInFirstPage, PaginatorInNextPage)
 from instagram_parser.crawler.crawler.data_extractor import (FirstPageParser, NextPageParser)
 from instagram_parser.crawler.crawler.spider_stopper import SpiderStopper
+from instagram_parser.crawler.crawler.post_detail_page_parser import PostDetailPageParser
 
 class ExampleSpider(scrapy.Spider):
     name = 'example'
@@ -81,3 +82,5 @@ class ExampleSpider(scrapy.Spider):
             yield {'posts_info': self.posts_info}
             raise CloseSpider('Work done!')
 
+    def parse_post_detail_page(self, response):
+        parser = PostDetailPageParser()
