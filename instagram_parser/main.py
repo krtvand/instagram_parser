@@ -3,7 +3,7 @@ from instagram_parser.crawler.crawler.spiders.example import ExampleSpider
 from instagram_parser.crawler.crawler.spider_stopper import ItemsCountSpiderStopper
 
 
-MAX_ITEMS_COUNT = 50
+MAX_ITEMS_COUNT = 40
 
 process = CrawlerProcess(
     {'LOG_LEVEL': 'INFO', 'FEED_URI': 'result.json', 'FEED_FORMAT': 'json'}

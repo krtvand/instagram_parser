@@ -1,5 +1,8 @@
+#TODO 429 http error - to many requests
+
 import scrapy
 from scrapy import Request
+from scrapy.exceptions import CloseSpider
 
 from instagram_parser.crawler.crawler.pagination import (Paginator, PaginatorInFirstPage, PaginatorInNextPage)
 from instagram_parser.crawler.crawler.data_extractor import (FirstPageParser, NextPageParser)
@@ -45,6 +48,7 @@ class ExampleSpider(scrapy.Spider):
             self.posts_info.append(self.page_parser.collect_data_from_post(post))
         if self.spider_stoper.should_we_stop_spider(self.posts_info):
             yield {'posts_info': self.posts_info}
+            raise CloseSpider('Work done!')
 
         # pagination
         if self.paginator.pagination_has_next_page(shared_data):
@@ -54,6 +58,7 @@ class ExampleSpider(scrapy.Spider):
             yield Request(next_page_url, headers=headers, meta=meta, callback=self.parse_next_page)
         else:
             yield {'posts_info': self.posts_info}
+            raise CloseSpider('Work done!')
 
     def parse_next_page(self, response):
         self.set_paginator('next_page_paginator')
@@ -64,6 +69,7 @@ class ExampleSpider(scrapy.Spider):
             self.posts_info.append(self.page_parser.collect_data_from_post(post))
         if self.spider_stoper.should_we_stop_spider(self.posts_info):
             yield {'posts_info': self.posts_info}
+            raise CloseSpider('Work done!')
 
         # pagination
         if self.paginator.pagination_has_next_page(shared_data):
@@ -73,7 +79,5 @@ class ExampleSpider(scrapy.Spider):
             yield Request(next_page_url, headers=headers, meta=meta, callback=self.parse_next_page)
         else:
             yield {'posts_info': self.posts_info}
-
-    def end(self, response):
-        yield {'posts_info': self.posts_info}
+            raise CloseSpider('Work done!')
 
