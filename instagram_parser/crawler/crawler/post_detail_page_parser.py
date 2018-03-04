@@ -21,3 +21,9 @@ class PostDetailPageParser:
 
         return username
 
+    def get_post_id_from_post(self, data: dict) -> str:
+        post_id = data.get('id')
+        if not post_id:
+            raise DataExtractorException('Can not get post id from post detail page')
+        return post_id
+
