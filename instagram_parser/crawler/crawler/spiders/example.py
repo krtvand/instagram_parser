@@ -1,6 +1,8 @@
 #TODO 429 http error - to many requests
+import json
 
 import scrapy
+from scrapy import signals
 from scrapy import Request
 from scrapy.exceptions import CloseSpider
 
@@ -21,8 +23,9 @@ class ExampleSpider(scrapy.Spider):
     paginator = None
     page_parser = None
 
-    def __init__(self, spider_stopper: SpiderStopper, *args, **kwargs):
+    def __init__(self, spider_stopper: SpiderStopper, result_file: str, *args, **kwargs):
         self.spider_stoper = spider_stopper
+        self.result_file = result_file
 
         super().__init__(*args, **kwargs)
 
@@ -51,10 +54,11 @@ class ExampleSpider(scrapy.Spider):
             headers = {'x-requested-with': 'XMLHttpRequest'}
             (k, v), = post_data.items()
             yield Request(url='{}/p/{}/?__a=1'.format(self.base_url, v['shortcode']),
-                          headers=headers, callback=self.parse_post_detail_page)
+                          headers=headers, callback=self.parse_post_detail_page, meta={'download_timeout': 0})
         if self.spider_stoper.should_we_stop_spider(self.posts_info):
-            yield self.posts_info
-            raise CloseSpider('Work done!')
+            return
+            # yield self.posts_info
+            # raise CloseSpider('Work done!')
 
         # pagination
         if self.paginator.pagination_has_next_page(shared_data):
@@ -63,8 +67,9 @@ class ExampleSpider(scrapy.Spider):
             meta = response.request.meta
             yield Request(next_page_url, headers=headers, meta=meta, callback=self.parse_next_page)
         else:
-            yield self.posts_info
-            raise CloseSpider('Work done!')
+            return
+            # yield self.posts_info
+            # raise CloseSpider('Work done!')
 
     def parse_next_page(self, response):
         self.set_paginator('next_page_paginator')
@@ -77,11 +82,12 @@ class ExampleSpider(scrapy.Spider):
             headers = {'x-requested-with': 'XMLHttpRequest'}
             (k, v), = post_data.items()
             yield Request(url='{}/p/{}/?__a=1'.format(self.base_url, v['shortcode']),
-                          headers=headers, callback=self.parse_post_detail_page)
+                          headers=headers, callback=self.parse_post_detail_page, meta={'download_timeout': 0})
 
         if self.spider_stoper.should_we_stop_spider(self.posts_info):
-            yield self.posts_info
-            raise CloseSpider('Work done!')
+            return
+            # yield self.posts_info
+            # raise CloseSpider('Work done!')
 
         # pagination
         if self.paginator.pagination_has_next_page(shared_data):
@@ -90,8 +96,9 @@ class ExampleSpider(scrapy.Spider):
             meta = response.request.meta
             yield Request(next_page_url, headers=headers, meta=meta, callback=self.parse_next_page)
         else:
-            yield self.posts_info
-            raise CloseSpider('Work done!')
+            return
+            # yield self.posts_info
+            # raise CloseSpider('Work done!')
 
     def parse_post_detail_page(self, response):
         parser = PostDetailPageParser()
@@ -99,3 +106,13 @@ class ExampleSpider(scrapy.Spider):
         post_data = parser.collect_data_from_post(page_data)
         (post_id, post_info), = post_data.items()
         self.posts_info[post_id].update(post_info)
+
+    @classmethod
+    def from_crawler(cls, crawler, *args, **kwargs):
+        spider = super().from_crawler(crawler, *args, **kwargs)
+        crawler.signals.connect(spider.spider_closed, signal=signals.spider_closed)
+        return spider
+
+    def spider_closed(self, spider):
+        with open(spider.result_file, 'w') as f:
+            f.write(json.dumps(spider.posts_info))
