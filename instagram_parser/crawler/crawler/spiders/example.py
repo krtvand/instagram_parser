@@ -43,7 +43,7 @@ class ExampleSpider(scrapy.Spider):
     def parse(self, response):
         self.set_paginator('index_page_paginator')
         self.set_page_parser('index_page_parser')
-        shared_data = self.page_parser.extract_shared_data(response)
+        shared_data = self.page_parser.get_page_info_from_json(response)
         posts_list = self.page_parser.get_post_objects(shared_data)
         for post in posts_list:
             self.posts_info.append(self.page_parser.collect_data_from_post(post))
@@ -64,7 +64,7 @@ class ExampleSpider(scrapy.Spider):
     def parse_next_page(self, response):
         self.set_paginator('next_page_paginator')
         self.set_page_parser('next_page_parser')
-        shared_data = self.page_parser.extract_shared_data(response)
+        shared_data = self.page_parser.get_page_info_from_json(response)
         posts_list = self.page_parser.get_post_objects(shared_data)
         for post in posts_list:
             self.posts_info.append(self.page_parser.collect_data_from_post(post))

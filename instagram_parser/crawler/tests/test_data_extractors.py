@@ -31,7 +31,7 @@ class TestIndexPageParser(unittest.TestCase):
             return file_content
 
     def test_shared_data_extractor(self):
-        shared_data = self.parser.extract_shared_data(self.response)
+        shared_data = self.parser.get_page_info_from_json(self.response)
         self.assertTrue(isinstance(shared_data, dict))
         self.assertTrue('entry_data' in shared_data)
 
@@ -43,14 +43,17 @@ class TestIndexPageParser(unittest.TestCase):
         self.assertDictEqual(json.loads(self.new_posts)[0], post_objects[0])
 
     def test_collect_data_from_post(self):
-        expected_data = {
-            'post_id': '1720482878935489581',
+        expected_post_id = '1720482878935489581'
+        expected_post_data = {
             'owner_id': '2085484199',
             'shortcode': 'BfgYhAZF1wt'
         }
+        expected = {expected_post_id: expected_post_data}
+
         post = json.loads(self.new_posts)[0]
         data = self.parser.collect_data_from_post(post)
-        self.assertDictEqual(expected_data, data)
+
+        self.assertDictEqual(expected, data)
 
 
 def fake_response_from_file(file_name, url=None):
@@ -101,7 +104,7 @@ class TestNextPageParser(unittest.TestCase):
             return file_content
 
     def test_extract_data_from_next_page(self):
-        next_page_data_dict = self.parser.extract_shared_data(self.response)
+        next_page_data_dict = self.parser.get_page_info_from_json(self.response)
         self.assertTrue(isinstance(next_page_data_dict, dict))
         self.assertTrue('data' in next_page_data_dict)
 
@@ -112,11 +115,14 @@ class TestNextPageParser(unittest.TestCase):
         self.assertDictEqual(json.loads(self.new_posts)[0], post_objects[0])
 
     def test_collect_data_from_post(self):
-        expected_data = {
-            'post_id': '1718847872394689700',
+        expected_post_id = '1718847872394689700'
+        expected_post_data = {
             'owner_id': '1156705436',
             'shortcode': 'Bfakwh5BXyk'
         }
+        expected = {expected_post_id: expected_post_data}
+
         post = json.loads(self.new_posts)[0]
         data = self.parser.collect_data_from_post(post)
-        self.assertDictEqual(expected_data, data)
+
+        self.assertDictEqual(expected, data)

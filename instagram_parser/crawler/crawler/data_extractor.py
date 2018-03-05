@@ -11,7 +11,7 @@ class DataExtractorException(Exception):
     """
 
 class LocationPageParser:
-    def extract_shared_data(self, response: scrapy.http.Response) -> dict:
+    def get_page_info_from_json(self, response: scrapy.http.Response) -> dict:
         """Получаем shared_data как dict
 
         shared_data - это json объект из исходного кода страницы, который содержит всю
@@ -23,39 +23,55 @@ class LocationPageParser:
         """
         Получение списка словарей с информацией о постах из shared_data объекта
         """
-        raise NotImplementedError
+        return []
 
     def collect_data_from_post(self, post: dict) -> dict:
         """
         Шаблонный метод для сбора необходимой информации из поста
         """
+        post_data = {}
         post_id = self.get_post_id_from_post(post)
+        if not post_id:
+            raise DataExtractorException('Can not get post id')
         owner_id = self.get_owner_id_from_post(post)
+        if owner_id:
+            post_data.update({'owner_id': owner_id})
         shortcode = self.get_shortcode_from_post(post)
-        if not all([post_id, owner_id, shortcode]):
-            raise DataExtractorException('Can not get data from post')
+        if shortcode:
+            post_data.update({'shortcode': shortcode})
+        username = self.get_owner_username(post)
+        if username:
+            post_data.update({'owner_username': username})
 
-        return {'post_id': post_id, 'owner_id': owner_id, 'shortcode': shortcode}
+        result = {post_id: post_data}
 
-    def get_owner_id_from_post(self, post: dict) -> str:
+        return result
+
+    def get_owner_id_from_post(self, post: dict) -> str or None:
         """
         Id автора поста
         """
-        raise NotImplementedError
+        return None
 
-    def get_post_id_from_post(self, post: dict) -> str:
+    def get_owner_username(self, data: dict) -> str or None:
+        """
+        Username автора поста
+        """
+        return None
+
+    def get_post_id_from_post(self, post: dict) -> str or None:
         """
         Id поста
         """
-        raise NotImplementedError
+        return None
 
-    def get_shortcode_from_post(self, post: dict) -> str:
+    def get_shortcode_from_post(self, post: dict) -> str or None:
         """Уникальный код поста.
 
         С помощью данного кода можно получить более подробную
         информацию о посте (например ник автора) через отдельный ajax запрос.
         """
-        raise NotImplementedError
+        return None
 
 
 class FirstPageParser(LocationPageParser):
@@ -63,7 +79,7 @@ class FirstPageParser(LocationPageParser):
     Парсинг индексной (первой) страницы с постами
     """
 
-    def extract_shared_data(self, response: scrapy.http.Response) -> dict:
+    def get_page_info_from_json(self, response: scrapy.http.Response) -> dict:
         """
         Вся информация о публикациях находится в json объекте в исходном коде страницы.
         """
@@ -108,7 +124,7 @@ class NextPageParser(LocationPageParser):
     """
     Парсер данных со страницы, полученной после запроса следующей страницы из пагинации
     """
-    def extract_shared_data(self, response: scrapy.http.Response) -> dict:
+    def get_page_info_from_json(self, response: scrapy.http.Response) -> dict:
         """
         Следующая страница при пагинации запрашивается через ajax запрос и в ответ
         приходит чистый json
