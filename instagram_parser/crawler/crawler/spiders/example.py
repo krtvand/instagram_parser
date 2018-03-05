@@ -17,7 +17,7 @@ class ExampleSpider(scrapy.Spider):
     index_page_parser = FirstPageParser()
     next_page_parser = NextPageParser()
     next_page_paginator = PaginatorInNextPage(base_url, location_id)
-    posts_info = []
+    posts_info = {}
     paginator = None
     page_parser = None
 
@@ -46,9 +46,14 @@ class ExampleSpider(scrapy.Spider):
         shared_data = self.page_parser.get_page_info_from_json(response)
         posts_list = self.page_parser.get_post_objects(shared_data)
         for post in posts_list:
-            self.posts_info.append(self.page_parser.collect_data_from_post(post))
+            post_data = self.page_parser.collect_data_from_post(post)
+            self.posts_info.update(post_data)
+            headers = {'x-requested-with': 'XMLHttpRequest'}
+            (k, v), = post_data.items()
+            yield Request(url='{}/p/{}/?__a=1'.format(self.base_url, v['shortcode']),
+                          headers=headers, callback=self.parse_post_detail_page)
         if self.spider_stoper.should_we_stop_spider(self.posts_info):
-            yield {'posts_info': self.posts_info}
+            yield self.posts_info
             raise CloseSpider('Work done!')
 
         # pagination
@@ -58,7 +63,7 @@ class ExampleSpider(scrapy.Spider):
             meta = response.request.meta
             yield Request(next_page_url, headers=headers, meta=meta, callback=self.parse_next_page)
         else:
-            yield {'posts_info': self.posts_info}
+            yield self.posts_info
             raise CloseSpider('Work done!')
 
     def parse_next_page(self, response):
@@ -67,9 +72,15 @@ class ExampleSpider(scrapy.Spider):
         shared_data = self.page_parser.get_page_info_from_json(response)
         posts_list = self.page_parser.get_post_objects(shared_data)
         for post in posts_list:
-            self.posts_info.append(self.page_parser.collect_data_from_post(post))
+            post_data = self.page_parser.collect_data_from_post(post)
+            self.posts_info.update(post_data)
+            headers = {'x-requested-with': 'XMLHttpRequest'}
+            (k, v), = post_data.items()
+            yield Request(url='{}/p/{}/?__a=1'.format(self.base_url, v['shortcode']),
+                          headers=headers, callback=self.parse_post_detail_page)
+
         if self.spider_stoper.should_we_stop_spider(self.posts_info):
-            yield {'posts_info': self.posts_info}
+            yield self.posts_info
             raise CloseSpider('Work done!')
 
         # pagination
@@ -79,8 +90,12 @@ class ExampleSpider(scrapy.Spider):
             meta = response.request.meta
             yield Request(next_page_url, headers=headers, meta=meta, callback=self.parse_next_page)
         else:
-            yield {'posts_info': self.posts_info}
+            yield self.posts_info
             raise CloseSpider('Work done!')
 
     def parse_post_detail_page(self, response):
         parser = PostDetailPageParser()
+        page_data = parser.get_page_data_as_dict(response)
+        post_data = parser.collect_data_from_post(page_data)
+        (post_id, post_info), = post_data.items()
+        self.posts_info[post_id].update(post_info)

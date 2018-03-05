@@ -6,7 +6,7 @@ class SpiderStopper:
         сделать вывод о том, что парсинг пора остановить
         """
 
-    def should_we_stop_spider(self, items: list) -> bool:
+    def should_we_stop_spider(self, items: dict) -> bool:
         raise NotImplementedError
 
 
