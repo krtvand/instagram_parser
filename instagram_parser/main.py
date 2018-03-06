@@ -1,12 +1,15 @@
 import json
+import datetime
 
 from scrapy.crawler import CrawlerProcess
 from instagram_parser.crawler.crawler.spiders.example import ExampleSpider
-from instagram_parser.crawler.crawler.spider_stopper import ItemsCountSpiderStopper
+from instagram_parser.crawler.crawler.spider_stopper import (ItemsCountSpiderStopper,
+                                                             PostPublicationDateStopper)
 
 
 MAX_ITEMS_COUNT = 10
 FILE_NAME = 'result.json'
+DATE_TILL = datetime.datetime.utcnow()
 
 process = CrawlerProcess(
     {
@@ -16,7 +19,8 @@ process = CrawlerProcess(
     }
 )
 
-spider_stopper = ItemsCountSpiderStopper({'max_items_count': MAX_ITEMS_COUNT})
+# spider_stopper = ItemsCountSpiderStopper({'max_items_count': MAX_ITEMS_COUNT})
+spider_stopper = PostPublicationDateStopper({'oldest_publication_date': DATE_TILL})
 
 def parse_instagram():
     process.crawl(ExampleSpider, spider_stopper=spider_stopper, result_file=FILE_NAME)

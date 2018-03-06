@@ -1,5 +1,6 @@
 import re
 import json
+import datetime
 
 import scrapy
 
@@ -42,6 +43,9 @@ class LocationPageParser:
         username = self.get_owner_username(post)
         if username:
             post_data.update({'owner_username': username})
+        publication_date = self.get_publication_date(post)
+        if publication_date:
+            post_data.update({'publication_date': publication_date})
 
         result = {post_id: post_data}
 
@@ -72,6 +76,11 @@ class LocationPageParser:
         информацию о посте (например ник автора) через отдельный ajax запрос.
         """
         return None
+
+    def get_publication_date(self, post: dict) -> datetime.datetime:
+        """
+        Дата публикации поста
+        """
 
 
 class FirstPageParser(LocationPageParser):
@@ -119,6 +128,12 @@ class FirstPageParser(LocationPageParser):
             raise DataExtractorException('Can not get shortcode from post')
         return shortcode
 
+    def get_publication_date(self, post: dict) -> datetime.datetime:
+        publication_date_in_epoch = post.get('date')
+        if not publication_date_in_epoch:
+            raise DataExtractorException('Can not get publication date from post')
+        publication_date = datetime.datetime.utcfromtimestamp(int(publication_date_in_epoch))
+        return publication_date
 
 class NextPageParser(LocationPageParser):
     """

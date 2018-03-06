@@ -50,13 +50,15 @@ class ExampleSpider(scrapy.Spider):
         posts_list = self.page_parser.get_post_objects(shared_data)
         for post in posts_list:
             post_data = self.page_parser.collect_data_from_post(post)
+            (post_id, post_info), = post_data.items()
+            if self.spider_stoper.should_we_stop_spider(post_info['publication_date']):
+                return
             self.posts_info.update(post_data)
             headers = {'x-requested-with': 'XMLHttpRequest'}
-            (k, v), = post_data.items()
-            yield Request(url='{}/p/{}/?__a=1'.format(self.base_url, v['shortcode']),
+
+            yield Request(url='{}/p/{}/?__a=1'.format(self.base_url, post_info['shortcode']),
                           headers=headers, callback=self.parse_post_detail_page, meta={'download_timeout': 0})
-        if self.spider_stoper.should_we_stop_spider(self.posts_info):
-            return
+
             # yield self.posts_info
             # raise CloseSpider('Work done!')
 
