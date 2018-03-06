@@ -128,12 +128,11 @@ class FirstPageParser(LocationPageParser):
             raise DataExtractorException('Can not get shortcode from post')
         return shortcode
 
-    def get_publication_date(self, post: dict) -> datetime.datetime:
+    def get_publication_date(self, post: dict) -> str:
         publication_date_in_epoch = post.get('date')
         if not publication_date_in_epoch:
             raise DataExtractorException('Can not get publication date from post')
-        publication_date = datetime.datetime.utcfromtimestamp(int(publication_date_in_epoch))
-        return publication_date
+        return publication_date_in_epoch
 
 class NextPageParser(LocationPageParser):
     """

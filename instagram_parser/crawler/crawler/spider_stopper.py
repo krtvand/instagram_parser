@@ -36,8 +36,9 @@ class PostPublicationDateStopper(SpiderStopper):
         super().__init__(params)
         self.oldest_publication_date = params.get('oldest_publication_date')
 
-    def should_we_stop_spider(self, post_publication_date: datetime.datetime) -> bool:
-        if post_publication_date <= self.oldest_publication_date:
+    def should_we_stop_spider(self, publication_date_in_epoch: int) -> bool:
+        publication_date = datetime.datetime.utcfromtimestamp(publication_date_in_epoch)
+        if publication_date <= self.oldest_publication_date:
             return True
         else:
             return False

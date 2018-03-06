@@ -49,7 +49,7 @@ class TestIndexPageParser(unittest.TestCase):
             'owner_id': '2085484199',
             'shortcode': 'BfgYhAZF1wt',
             # 22 February 2018 г., 16:39:23
-            'publication_date': datetime.datetime(year=2018, month=2, day=22, hour=16, minute=39, second=23)
+            'publication_date': 1519317563
         }
         expected = {expected_post_id: expected_post_data}
 

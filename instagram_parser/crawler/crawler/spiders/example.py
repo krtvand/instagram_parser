@@ -1,5 +1,6 @@
 #TODO 429 http error - to many requests
 import json
+import datetime
 
 import scrapy
 from scrapy import signals
@@ -9,6 +10,7 @@ from scrapy.exceptions import CloseSpider
 from instagram_parser.crawler.crawler.pagination import (Paginator, PaginatorInFirstPage, PaginatorInNextPage)
 from instagram_parser.crawler.crawler.data_extractor import (FirstPageParser, NextPageParser)
 from instagram_parser.crawler.crawler.spider_stopper import SpiderStopper
+from instagram_parser.crawler.crawler.posts_filter import PublicationDatePostFilter
 from instagram_parser.crawler.crawler.post_detail_page_parser import PostDetailPageParser
 
 class ExampleSpider(scrapy.Spider):
@@ -25,6 +27,9 @@ class ExampleSpider(scrapy.Spider):
 
     def __init__(self, spider_stopper: SpiderStopper, result_file: str, *args, **kwargs):
         self.spider_stoper = spider_stopper
+        date_from = datetime.datetime.utcnow() - datetime.timedelta(minutes=30)
+        date_till = datetime.datetime.utcnow()
+        self.post_filter = PublicationDatePostFilter(date_from, date_till)
         self.result_file = result_file
 
         super().__init__(*args, **kwargs)
@@ -53,6 +58,8 @@ class ExampleSpider(scrapy.Spider):
             (post_id, post_info), = post_data.items()
             if self.spider_stoper.should_we_stop_spider(post_info['publication_date']):
                 return
+            if self.post_filter.must_be_discarded(post_data):
+                continue
             self.posts_info.update(post_data)
             headers = {'x-requested-with': 'XMLHttpRequest'}
 

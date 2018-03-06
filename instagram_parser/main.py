@@ -9,7 +9,7 @@ from instagram_parser.crawler.crawler.spider_stopper import (ItemsCountSpiderSto
 
 MAX_ITEMS_COUNT = 10
 FILE_NAME = 'result.json'
-DATE_TILL = datetime.datetime.utcnow()
+DATE_TILL = datetime.datetime.utcnow() - datetime.timedelta(minutes=30)
 
 process = CrawlerProcess(
     {
