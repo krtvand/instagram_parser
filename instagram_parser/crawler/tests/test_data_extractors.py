@@ -6,8 +6,8 @@ import datetime
 
 from scrapy.http import HtmlResponse, Request
 
-from instagram_parser.crawler.crawler.data_extractor import (NextPageParser,
-                                                             FirstPageParser)
+from instagram_parser.crawler.crawler.data_extractors import (NextPageDataExtractor,
+                                                              FirstPageDataExtractor)
 
 class TestIndexPageParser(unittest.TestCase):
 
@@ -19,7 +19,7 @@ class TestIndexPageParser(unittest.TestCase):
         self.shared_data = self._load_shared_data(SHARED_DATA_FILE)
         self.shared_data_as_dict = json.loads(self.shared_data)
         self.new_posts = self._load_shared_data(POSTS_FILE)
-        self.parser = FirstPageParser()
+        self.parser = FirstPageDataExtractor()
 
     def _load_shared_data(self, file_name):
         if not file_name[0] == '/':
@@ -94,7 +94,7 @@ class TestNextPageParser(unittest.TestCase):
         self.next_page_data_str = self._load_shared_data(NEXT_PAGE_SOURCE)
         self.next_page_data_as_dict = json.loads(self.next_page_data_str)
         self.new_posts = self._load_shared_data(NEXT_PAGE_POSTS)
-        self.parser = NextPageParser()
+        self.parser = NextPageDataExtractor()
 
     def _load_shared_data(self, file_name):
         if not file_name[0] == '/':

@@ -11,7 +11,7 @@ class DataExtractorException(Exception):
     Например не найден необходимый елемент.
     """
 
-class LocationPageParser:
+class LocationPageDataExtractor:
     def get_page_info_from_json(self, response: scrapy.http.Response) -> dict:
         """Получаем shared_data как dict
 
@@ -83,7 +83,7 @@ class LocationPageParser:
         """
 
 
-class FirstPageParser(LocationPageParser):
+class FirstPageDataExtractor(LocationPageDataExtractor):
     """
     Парсинг индексной (первой) страницы с постами
     """
@@ -135,7 +135,8 @@ class FirstPageParser(LocationPageParser):
         publication_date = datetime.datetime.utcfromtimestamp(int(publication_date_in_epoch))
         return publication_date
 
-class NextPageParser(LocationPageParser):
+
+class NextPageDataExtractor(LocationPageDataExtractor):
     """
     Парсер данных со страницы, полученной после запроса следующей страницы из пагинации
     """
