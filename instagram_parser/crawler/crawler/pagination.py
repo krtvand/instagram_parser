@@ -69,7 +69,12 @@ class Paginator:
     def get_queryhash_from_js_source(self, page_source: str):
         pattern = r'(.*)(?P<text_before>locationPosts\.byLocationId\.get\(e\)\.pagination},queryId:\")(?P<query_hash>.*?)(\".*)'
         match = re.match(pattern, page_source)
-        query_hash = match.group('query_hash')
+        if match:
+            query_hash = match.group('query_hash')
+        else:
+            with open('debug', 'w') as f:
+                f.write(page_source)
+            raise PaginationException('Can not extract query_hash from js_source')
 
         return query_hash
 
