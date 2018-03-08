@@ -11,7 +11,7 @@ class DataExtractorException(Exception):
     Например не найден необходимый елемент.
     """
 
-class LocationPageParser:
+class LocationPageDataExtractor:
     def get_page_info_from_json(self, response: scrapy.http.Response) -> dict:
         """Получаем shared_data как dict
 
@@ -83,7 +83,7 @@ class LocationPageParser:
         """
 
 
-class FirstPageParser(LocationPageParser):
+class FirstPageDataExtractor(LocationPageDataExtractor):
     """
     Парсинг индексной (первой) страницы с постами
     """
@@ -134,7 +134,7 @@ class FirstPageParser(LocationPageParser):
             raise DataExtractorException('Can not get publication date from post')
         return publication_date_in_epoch
 
-class NextPageParser(LocationPageParser):
+class NextPageDataExtractor(LocationPageDataExtractor):
     """
     Парсер данных со страницы, полученной после запроса следующей страницы из пагинации
     """
@@ -181,22 +181,3 @@ class NextPageParser(LocationPageParser):
         if not publication_date_in_epoch:
             raise DataExtractorException('Can not get publication date from post')
         return publication_date_in_epoch
-
-
-def get_last_post_id(shared_data: dict) -> str:
-    try:
-        last_post_id = shared_data.get('entry_data', {}).get('LocationsPage', )[0].get('location', {}).get('media', {}).get('page_info', {}).get('end_cursor')
-        if not last_post_id:
-            raise Exception
-    except Exception:
-        raise DataExtractorException('Can not get last post id (end_cursor) from shared_data')
-    return last_post_id
-
-def pagination_has_next_page(shared_data: dict) -> bool:
-    try:
-        pagination_has_next_page = shared_data.get('entry_data', {}).get('LocationsPage', )[0].get('location', {}).get('media', {}).get('page_info', {}).get('has_next_page')
-        if pagination_has_next_page is None:
-            raise Exception
-    except Exception:
-        raise DataExtractorException('Can not get value for next_has_page attribute from shared_data')
-    return pagination_has_next_page

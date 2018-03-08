@@ -2,8 +2,8 @@ import unittest
 import os
 import json
 
-from instagram_parser.crawler.crawler.data_extractor import (NextPageParser,
-                                                             FirstPageParser)
+from instagram_parser.crawler.crawler.data_extractor import (NextPageDataExtractor,
+                                                             FirstPageDataExtractor)
 from instagram_parser.crawler.tests.utils import (load_text_from_file,
                                                   fake_scrapy_response_from_file)
 
@@ -17,7 +17,7 @@ class TestIndexPageParser(unittest.TestCase):
         self.shared_data = load_text_from_file(SHARED_DATA_FILE)
         self.shared_data_as_dict = json.loads(self.shared_data)
         self.new_posts = load_text_from_file(POSTS_FILE)
-        self.parser = FirstPageParser()
+        self.parser = FirstPageDataExtractor()
 
     def test_shared_data_extractor(self):
         shared_data = self.parser.get_page_info_from_json(self.response)
@@ -56,7 +56,7 @@ class TestNextPageParser(unittest.TestCase):
         self.next_page_data_str = load_text_from_file(NEXT_PAGE_SOURCE)
         self.next_page_data_as_dict = json.loads(self.next_page_data_str)
         self.new_posts = load_text_from_file(NEXT_PAGE_POSTS)
-        self.parser = NextPageParser()
+        self.parser = NextPageDataExtractor()
 
     def test_extract_data_from_next_page(self):
         next_page_data_dict = self.parser.get_page_info_from_json(self.response)

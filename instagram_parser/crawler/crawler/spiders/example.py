@@ -4,7 +4,7 @@ import scrapy
 from scrapy import Request
 
 from instagram_parser.crawler.crawler.pagination import (Paginator, PaginatorInFirstPage, PaginatorInNextPage)
-from instagram_parser.crawler.crawler.data_extractor import (FirstPageParser, NextPageParser)
+from instagram_parser.crawler.crawler.data_extractor import (FirstPageDataExtractor, NextPageDataExtractor)
 from instagram_parser.crawler.crawler.spider_stopper import SpiderStopper
 from instagram_parser.crawler.crawler.posts_filter import PostFilter
 from instagram_parser.crawler.crawler.post_detail_page_parser import PostDetailPageParser
@@ -39,8 +39,8 @@ class ExampleSpider(scrapy.Spider):
 
     def set_page_parser(self, parser_type):
         parsers = {
-            'index_page_parser': FirstPageParser(),
-            'next_page_parser': NextPageParser()
+            'index_page_parser': FirstPageDataExtractor(),
+            'next_page_parser': NextPageDataExtractor()
         }
         self.page_parser = parsers[parser_type]
 
