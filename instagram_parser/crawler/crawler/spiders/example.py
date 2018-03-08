@@ -1,36 +1,32 @@
 #TODO 429 http error - to many requests
-import json
-import datetime
 
 import scrapy
-from scrapy import signals
 from scrapy import Request
-from scrapy.exceptions import CloseSpider
 
 from instagram_parser.crawler.crawler.pagination import (Paginator, PaginatorInFirstPage, PaginatorInNextPage)
 from instagram_parser.crawler.crawler.data_extractor import (FirstPageParser, NextPageParser)
 from instagram_parser.crawler.crawler.spider_stopper import SpiderStopper
-from instagram_parser.crawler.crawler.posts_filter import PublicationDatePostFilter
+from instagram_parser.crawler.crawler.posts_filter import PostFilter
 from instagram_parser.crawler.crawler.post_detail_page_parser import PostDetailPageParser
 
 class ExampleSpider(scrapy.Spider):
     name = 'example'
-    location_id = '224829075'
     base_url = 'https://www.instagram.com'
-    start_urls = ['{}/explore/locations/{}/'.format(base_url, location_id)]
-    index_page_parser = FirstPageParser()
-    next_page_parser = NextPageParser()
-    next_page_paginator = PaginatorInNextPage(base_url, location_id)
-    posts_info = {}
-    paginator = None
-    page_parser = None
 
-    def __init__(self, spider_stopper: SpiderStopper, result_file: str, *args, **kwargs):
+    def __init__(self, location_id: str, spider_stopper: SpiderStopper, posts_filter: PostFilter,
+                 result: dict, *args, **kwargs):
+        """
+        :param spider_stopper: Остановщик парсера
+        :param posts_filter: Фильтровщик постов (например по дате публикации)
+        :param result: Результат работы парсера сохраняем в аргумент, переданный при запуске
+        """
+        self.location_id = location_id
+        self.start_urls = ['{}/explore/locations/{}/'.format(self.base_url, self.location_id)]
+        self.posts_info = result
         self.spider_stoper = spider_stopper
-        date_from = datetime.datetime.utcnow() - datetime.timedelta(minutes=30)
-        date_till = datetime.datetime.utcnow()
-        self.post_filter = PublicationDatePostFilter(date_from, date_till)
-        self.result_file = result_file
+        self.post_filter = posts_filter
+        self.paginator = None
+        self.page_parser = None
 
         super().__init__(*args, **kwargs)
 
@@ -66,10 +62,6 @@ class ExampleSpider(scrapy.Spider):
             yield Request(url='{}/p/{}/?__a=1'.format(self.base_url, post_info['shortcode']),
                           headers=headers, callback=self.parse_post_detail_page, meta={'download_timeout': 0})
 
-            # yield self.posts_info
-            # raise CloseSpider('Work done!')
-
-        # pagination
         if self.paginator.pagination_has_next_page(shared_data):
             next_page_url = self.paginator.get_url_for_next_page(response, shared_data)
             headers = {'x-requested-with': 'XMLHttpRequest'}
@@ -115,13 +107,3 @@ class ExampleSpider(scrapy.Spider):
         post_data = parser.collect_data_from_post(page_data)
         (post_id, post_info), = post_data.items()
         self.posts_info[post_id].update(post_info)
-
-    @classmethod
-    def from_crawler(cls, crawler, *args, **kwargs):
-        spider = super().from_crawler(crawler, *args, **kwargs)
-        crawler.signals.connect(spider.spider_closed, signal=signals.spider_closed)
-        return spider
-
-    def spider_closed(self, spider):
-        with open(spider.result_file, 'w') as f:
-            f.write(json.dumps(spider.posts_info))
