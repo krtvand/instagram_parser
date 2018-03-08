@@ -16,7 +16,7 @@ class PublicationDatePostFilter(PostFilter):
     Фильтрация по дате публикации
     """
 
-    def __init__(self, date_from, date_till):
+    def __init__(self, date_from=None, date_till=None):
         self.date_from = date_from
         self.date_till = date_till
 
@@ -28,3 +28,7 @@ class PublicationDatePostFilter(PostFilter):
             return True
         else:
             return False
+
+class DummyPostFilter(PostFilter):
+    def must_be_discarded(self, post: dict) -> bool:
+        return False

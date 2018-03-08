@@ -3,7 +3,8 @@ import datetime
 
 from scrapy.crawler import CrawlerProcess
 from instagram_parser.crawler.crawler.spiders.example import ExampleSpider
-from instagram_parser.crawler.crawler.posts_filter import PublicationDatePostFilter
+from instagram_parser.crawler.crawler.posts_filter import (PublicationDatePostFilter,
+                                                           DummyPostFilter)
 from instagram_parser.crawler.crawler.spider_stopper import (PostPublicationDateStopper,
                                                              ItemsCountSpiderStopper)
 
@@ -11,16 +12,19 @@ from instagram_parser.crawler.crawler.spider_stopper import (PostPublicationDate
 def parse_instagram(location_id: str, date_from: datetime.datetime, date_till: datetime.datetime, max_items=None):
     process = CrawlerProcess(
         {
-            'LOG_LEVEL': 'INFO',
+            'LOG_LEVEL': 'DEBUG',
             'DOWNLOAD_DELAY': 1,
             'USER_AGENT': 'Firefox 20.0 (Win 8 32)" useragent="Mozilla/5.0 (Windows NT 6.2; rv:20.0) Gecko/20121202 Firefox/20.0'
         }
     )
     if max_items:
         spider_stopper = ItemsCountSpiderStopper({'max_items_count': max_items})
+        posts_filter = DummyPostFilter()
     else:
         spider_stopper = PostPublicationDateStopper({'oldest_publication_date': date_from})
-    posts_filter = PublicationDatePostFilter(date_from, date_till)
+        posts_filter = PublicationDatePostFilter(date_from, date_till)
+
+
     result = {}
     process.crawl(ExampleSpider, spider_stopper=spider_stopper, posts_filter=posts_filter,
                   result=result, location_id=location_id)

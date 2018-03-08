@@ -176,6 +176,12 @@ class NextPageParser(LocationPageParser):
             raise DataExtractorException('Can not get shortcode from post')
         return shortcode
 
+    def get_publication_date(self, post: dict) -> str:
+        publication_date_in_epoch = post.get('node', {}).get('taken_at_timestamp')
+        if not publication_date_in_epoch:
+            raise DataExtractorException('Can not get publication date from post')
+        return publication_date_in_epoch
+
 
 def get_last_post_id(shared_data: dict) -> str:
     try:

@@ -67,7 +67,10 @@ class Paginator:
         return link
 
     def get_queryhash_from_js_source(self, page_source: str):
-        pattern = r'(.*)(?P<text_before>locationPosts\.byLocationId\.get\(e\)\.pagination},queryId:\")(?P<query_hash>.*?)(\".*)'
+        # TODO Заглушка. убрать.
+        query_hash = '951c979213d7e7a1cf1d73e2f661cbd1'
+        return query_hash
+        pattern = r'(?P<text_before>locationPosts\.byLocationId\.get\(e\)\.pagination},queryId:\")(?P<query_hash>.*?)(\",queryParams)'
         match = re.match(pattern, page_source)
         if match:
             query_hash = match.group('query_hash')
@@ -75,7 +78,6 @@ class Paginator:
             with open('debug', 'w') as f:
                 f.write(page_source)
             raise PaginationException('Can not extract query_hash from js_source')
-
         return query_hash
 
 

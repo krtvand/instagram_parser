@@ -121,7 +121,8 @@ class TestNextPageParser(unittest.TestCase):
         expected_post_id = '1718847872394689700'
         expected_post_data = {
             'owner_id': '1156705436',
-            'shortcode': 'Bfakwh5BXyk'
+            'shortcode': 'Bfakwh5BXyk',
+            'publication_date': 1519122655
         }
         expected = {expected_post_id: expected_post_data}
 
