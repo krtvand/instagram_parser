@@ -28,4 +28,12 @@ def fake_scrapy_response_from_file(file_name, url=None):
     return response
 
 
-
+def load_text_from_file(file_name):
+    if not file_name[0] == '/':
+        responses_dir = os.path.dirname(os.path.realpath(__file__))
+        file_path = os.path.join(responses_dir, file_name)
+    else:
+        file_path = file_name
+    with open(file_path, 'r') as f:
+        file_content = f.read()
+        return file_content

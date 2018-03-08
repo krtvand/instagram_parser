@@ -5,24 +5,17 @@ import json
 
 import requests_mock
 
-from instagram_parser.crawler.tests.utils import fake_scrapy_response_from_file
-from instagram_parser.crawler.crawler.pagination import PaginatorInFirstPage, Paginator, PaginatorInNextPage
+from instagram_parser.crawler.tests.utils import (fake_scrapy_response_from_file,
+                                                  load_text_from_file)
+from instagram_parser.crawler.crawler.pagination import (PaginatorInFirstPage,
+                                                         Paginator,
+                                                         PaginatorInNextPage)
 
 
 class TestPaginatorBase:
     LOCATION_ID = '213526478'
     base_url = 'https://www.instagram.com'
     SHARED_DATA_FILE = 'source_data/shared_data.txt'
-
-    def _load_shared_data(self, file_name):
-        if not file_name[0] == '/':
-            responses_dir = os.path.dirname(os.path.realpath(__file__))
-            file_path = os.path.join(responses_dir, file_name)
-        else:
-            file_path = file_name
-        with open(file_path, 'r') as f:
-            file_content = f.read()
-            return file_content
 
 
 class TestPaginator(TestPaginatorBase, unittest.TestCase):
@@ -31,14 +24,14 @@ class TestPaginator(TestPaginatorBase, unittest.TestCase):
 
         PAGE_SOURCE = 'source_data/instagram_publications_by_location.html'
         JS_FILE_WITH_QUERYHASH = 'source_data/LocationPageContainer.js'
-        self.shared_data = self._load_shared_data(self.SHARED_DATA_FILE)
+        self.shared_data = load_text_from_file(self.SHARED_DATA_FILE)
         self.shared_data_as_dict = json.loads(self.shared_data)
         self.response = fake_scrapy_response_from_file(file_name=PAGE_SOURCE)
         self.response_for_js_with_queryhash = fake_scrapy_response_from_file(
             file_name=JS_FILE_WITH_QUERYHASH)
-        self.source_of_js_with_queryhash = self._load_shared_data(JS_FILE_WITH_QUERYHASH)
+        self.source_of_js_with_queryhash = load_text_from_file(JS_FILE_WITH_QUERYHASH)
         self.response = fake_scrapy_response_from_file(file_name=PAGE_SOURCE)
-        self.source_of_js_with_queryhash = self._load_shared_data(JS_FILE_WITH_QUERYHASH)
+        self.source_of_js_with_queryhash = load_text_from_file(JS_FILE_WITH_QUERYHASH)
         self.last_post_id = '1718895412364831673'
         self.paginator = Paginator(self.base_url, location_id=self.LOCATION_ID)
 
@@ -74,7 +67,7 @@ class TestPaginator(TestPaginatorBase, unittest.TestCase):
 class TestFirstPagePaginator(TestPaginatorBase, unittest.TestCase):
     def setUp(self):
         self.paginator = PaginatorInFirstPage(self.base_url, self.LOCATION_ID)
-        self.shared_data = self._load_shared_data(self.SHARED_DATA_FILE)
+        self.shared_data = load_text_from_file(self.SHARED_DATA_FILE)
         self.shared_data_as_dict = json.loads(self.shared_data)
 
     def test_get_last_post_id(self):
@@ -94,7 +87,7 @@ class TestNextPagePaginator(TestPaginatorBase, unittest.TestCase):
 
     def setUp(self):
         self.paginator = PaginatorInNextPage(self.base_url, self.LOCATION_ID)
-        self.shared_data = self._load_shared_data(self.NEXT_PAGE_SOURCE)
+        self.shared_data = load_text_from_file(self.NEXT_PAGE_SOURCE)
         self.shared_data_as_dict = json.loads(self.shared_data)
 
     def test_get_last_post_id(self):
