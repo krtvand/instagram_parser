@@ -11,5 +11,5 @@ class TestItemsCountSpiderStopper(unittest.TestCase):
 
     def test_do_we_must_stop_spider(self):
         items = list(range(self.max_items_count + 1))
-        should_stop = self.spider_stopper.should_we_stop_spider(items)
+        should_stop = self.spider_stopper.should_we_stop_spider(items=items)
         self.assertTrue(should_stop)
