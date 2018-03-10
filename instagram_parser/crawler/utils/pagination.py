@@ -72,8 +72,6 @@ class Paginator:
         if match:
             query_hash = match.group('query_hash')
         else:
-            with open('debug', 'w') as f:
-                f.write(page_source)
             raise PaginationException('Can not extract query_hash from js_source')
         return query_hash
 
