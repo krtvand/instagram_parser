@@ -1,11 +1,10 @@
 import unittest
-import os
 import json
 
-from instagram_parser.crawler.crawler.data_extractor import (NextPageDataExtractor,
-                                                             FirstPageDataExtractor)
-from instagram_parser.crawler.tests.utils import (load_text_from_file,
-                                                  fake_scrapy_response_from_file)
+from instagram_parser.crawler.data_extractors.next_page_data_extractor import (NextPageDataExtractor)
+from instagram_parser.crawler.data_extractors.first_page_data_extractor import (FirstPageDataExtractor)
+from instagram_parser.tests.utils import (load_text_from_file,
+                                                    fake_scrapy_response_from_file)
 
 class TestIndexPageParser(unittest.TestCase):
 

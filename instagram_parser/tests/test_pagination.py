@@ -1,15 +1,14 @@
-import os
 import unittest
 from unittest.mock import MagicMock
 import json
 
 import requests_mock
 
-from instagram_parser.crawler.tests.utils import (fake_scrapy_response_from_file,
-                                                  load_text_from_file)
-from instagram_parser.crawler.crawler.pagination import (PaginatorInFirstPage,
-                                                         Paginator,
-                                                         PaginatorInNextPage)
+from instagram_parser.tests.utils import (fake_scrapy_response_from_file,
+                                                    load_text_from_file)
+from instagram_parser.crawler.utils.pagination import (PaginatorInFirstPage,
+                                                       Paginator,
+                                                       PaginatorInNextPage)
 
 
 class TestPaginatorBase:

@@ -1,13 +1,10 @@
 import unittest
-import os
-import re
 import json
 
-from scrapy.http import HtmlResponse, Request
-from instagram_parser.crawler.tests.utils import (fake_scrapy_response_from_file,
-                                                  load_text_from_file)
+from instagram_parser.tests.utils import (fake_scrapy_response_from_file,
+                                                    load_text_from_file)
 
-from instagram_parser.crawler.crawler.post_detail_page_parser import (PostDetailPageParser)
+from instagram_parser.crawler.data_extractors.post_detail_page_data_extractor import (PostDetailPageDataExtractor)
 
 class TestIndexPageParser(unittest.TestCase):
 
@@ -15,7 +12,7 @@ class TestIndexPageParser(unittest.TestCase):
         PAGE_SOURCE_FILE_NAME = 'source_data/post_detail_source.json'
         self.response = fake_scrapy_response_from_file(file_name=PAGE_SOURCE_FILE_NAME)
         self.page_data_as_dict = json.loads(load_text_from_file(PAGE_SOURCE_FILE_NAME))
-        self.parser = PostDetailPageParser()
+        self.parser = PostDetailPageDataExtractor()
 
     def test_get_owner_username(self):
         post_owner_username = self.parser.get_owner_username(self.page_data_as_dict)

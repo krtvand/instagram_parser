@@ -3,14 +3,15 @@
 import scrapy
 from scrapy import Request
 
-from instagram_parser.crawler.crawler.pagination import (Paginator, PaginatorInFirstPage, PaginatorInNextPage)
-from instagram_parser.crawler.crawler.data_extractor import (FirstPageDataExtractor, NextPageDataExtractor)
-from instagram_parser.crawler.crawler.spider_stopper import SpiderStopper
-from instagram_parser.crawler.crawler.posts_filter import PostFilter
-from instagram_parser.crawler.crawler.post_detail_page_parser import PostDetailPageParser
+from instagram_parser.crawler.utils.pagination import (PaginatorInFirstPage, PaginatorInNextPage)
+from instagram_parser.crawler.data_extractors.next_page_data_extractor import NextPageDataExtractor
+from instagram_parser.crawler.data_extractors.first_page_data_extractor import FirstPageDataExtractor
+from instagram_parser.crawler.utils.spider_stopper import SpiderStopper
+from instagram_parser.crawler.utils.posts_filter import PostFilter
+from instagram_parser.crawler.data_extractors.post_detail_page_data_extractor import PostDetailPageDataExtractor
 
-class ExampleSpider(scrapy.Spider):
-    name = 'example'
+class InstagramPostsSpider(scrapy.Spider):
+    name = 'instagram_posts_spider'
     base_url = 'https://www.instagram.com'
 
     def __init__(self, location_id: str, spider_stopper: SpiderStopper, posts_filter: PostFilter,
@@ -105,7 +106,7 @@ class ExampleSpider(scrapy.Spider):
         """
         Парсинг информации со страницы с детальной информацией о посте
         """
-        parser = PostDetailPageParser()
+        parser = PostDetailPageDataExtractor()
         page_data = parser.get_page_data_as_dict(response)
         post_data = parser.collect_data_from_post(page_data)
         (post_id, post_info), = post_data.items()

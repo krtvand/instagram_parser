@@ -2,11 +2,11 @@ import json
 import datetime
 
 from scrapy.crawler import CrawlerProcess
-from instagram_parser.crawler.crawler.spiders.example import ExampleSpider
-from instagram_parser.crawler.crawler.posts_filter import (PublicationDatePostFilter,
-                                                           DummyPostFilter)
-from instagram_parser.crawler.crawler.spider_stopper import (PostPublicationDateStopper,
-                                                             ItemsCountSpiderStopper)
+from instagram_parser.crawler.spiders.instagram_posts_spider import InstagramPostsSpider
+from instagram_parser.crawler.utils.posts_filter import (PublicationDatePostFilter,
+                                                         DummyPostFilter)
+from instagram_parser.crawler.utils.spider_stopper import (PostPublicationDateStopper,
+                                                           ItemsCountSpiderStopper)
 
 
 def parse_instagram(location_id: str, date_from: datetime.datetime, date_till: datetime.datetime, max_items=None):
@@ -26,7 +26,7 @@ def parse_instagram(location_id: str, date_from: datetime.datetime, date_till: d
 
 
     result = {}
-    process.crawl(ExampleSpider, spider_stopper=spider_stopper, posts_filter=posts_filter,
+    process.crawl(InstagramPostsSpider, spider_stopper=spider_stopper, posts_filter=posts_filter,
                   result=result, location_id=location_id)
     process.start()
 
@@ -37,7 +37,7 @@ if __name__ == '__main__':
     date_till = datetime.datetime.utcnow() - datetime.timedelta(minutes=10)
     location_id = '224829075'
 
-    result = parse_instagram(location_id=location_id, date_from=date_from, date_till=date_till, max_items=30)
+    result = parse_instagram(location_id=location_id, date_from=date_from, date_till=date_till, max_items=3)
     print(json.dumps(result))
 
     with open('parsing_results', 'w') as f:

@@ -2,10 +2,10 @@ import json
 
 import scrapy
 
-from instagram_parser.crawler.crawler.data_extractor import DataExtractorException
-from instagram_parser.crawler.crawler.data_extractor import LocationPageDataExtractor
+from instagram_parser.crawler.data_extractors.first_page_data_extractor import DataExtractorException
+from instagram_parser.crawler.data_extractors.first_page_data_extractor import LocationPageDataExtractor
 
-class PostDetailPageParser(LocationPageDataExtractor):
+class PostDetailPageDataExtractor(LocationPageDataExtractor):
 
     def get_page_info_from_json(self, response: scrapy.http.Response) -> dict:
         """
