@@ -10,6 +10,7 @@ from instagram_parser.crawler.utils.spider_stopper import SpiderStopper
 from instagram_parser.crawler.utils.posts_filter import PostFilter
 from instagram_parser.crawler.data_extractors.post_detail_page_data_extractor import PostDetailPageDataExtractor
 
+
 class InstagramPostsSpider(scrapy.Spider):
     name = 'instagram_posts_spider'
     base_url = 'https://www.instagram.com'

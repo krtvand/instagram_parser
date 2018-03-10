@@ -12,6 +12,7 @@ from instagram_parser.crawler.utils.spider_stopper import (PostPublicationDateSt
 def parse_instagram(location_id: str, date_from: datetime.datetime, date_till: datetime.datetime, max_items=None):
     process = CrawlerProcess(
         {
+            'LOG_FILE': 'parser_logs.log',
             'LOG_LEVEL': 'DEBUG',
             'DOWNLOAD_DELAY': 1,
             'USER_AGENT': 'Firefox 20.0 (Win 8 32)" useragent="Mozilla/5.0 (Windows NT 6.2; rv:20.0) Gecko/20121202 Firefox/20.0'
