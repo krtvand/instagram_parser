@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import datetime
 
 import scrapy
@@ -9,8 +10,8 @@ class DataExtractorException(Exception):
     Например не найден необходимый елемент.
     """
 
-class LocationPageDataExtractor:
-    def get_page_info_from_json(self, response: scrapy.http.Response) -> dict:
+class LocationPageDataExtractor(object):
+    def get_page_info_from_json(self, response):
         """Получаем shared_data как dict
 
         shared_data - это json объект из исходного кода страницы, который содержит всю
@@ -18,13 +19,13 @@ class LocationPageDataExtractor:
         """
         raise NotImplementedError
 
-    def get_post_objects(self, shared_data: dict) -> list:
+    def get_post_objects(self, shared_data):
         """
         Получение списка словарей с информацией о постах из shared_data объекта
         """
         return []
 
-    def collect_data_from_post(self, post: dict) -> dict:
+    def collect_data_from_post(self, post):
         """
         Шаблонный метод для сбора необходимой информации из поста
         """
@@ -49,25 +50,25 @@ class LocationPageDataExtractor:
 
         return result
 
-    def get_owner_id_from_post(self, post: dict) -> str or None:
+    def get_owner_id_from_post(self, post):
         """
         Id автора поста
         """
         return None
 
-    def get_owner_username(self, data: dict) -> str or None:
+    def get_owner_username(self, data):
         """
         Username автора поста
         """
         return None
 
-    def get_post_id_from_post(self, post: dict) -> str or None:
+    def get_post_id_from_post(self, post):
         """
         Id поста
         """
         return None
 
-    def get_shortcode_from_post(self, post: dict) -> str or None:
+    def get_shortcode_from_post(self, post):
         """Уникальный код поста.
 
         С помощью данного кода можно получить более подробную
@@ -75,7 +76,7 @@ class LocationPageDataExtractor:
         """
         return None
 
-    def get_publication_date(self, post: dict) -> datetime.datetime:
+    def get_publication_date(self, post):
         """
         Дата публикации поста
         """

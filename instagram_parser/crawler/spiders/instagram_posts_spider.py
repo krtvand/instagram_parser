@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 #TODO 429 http error - to many requests
 
 import scrapy
@@ -15,8 +17,8 @@ class InstagramPostsSpider(scrapy.Spider):
     name = 'instagram_posts_spider'
     base_url = 'https://www.instagram.com'
 
-    def __init__(self, location_id: str, spider_stopper: SpiderStopper, posts_filter: PostFilter,
-                 result: dict, *args, **kwargs):
+    def __init__(self, location_id, spider_stopper, posts_filter,
+                 result, *args, **kwargs):
         """
         :param spider_stopper: Остановщик парсера
         :param posts_filter: Фильтровщик постов (например по дате публикации)
@@ -30,7 +32,7 @@ class InstagramPostsSpider(scrapy.Spider):
         self.paginator = None
         self.page_parser = None
 
-        super().__init__(*args, **kwargs)
+        super(InstagramPostsSpider, self).__init__(*args, **kwargs)
 
     def set_paginator(self, paginator_type):
         paginators = {

@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import datetime
 
 class SpiderStopperException(Exception):
@@ -5,15 +7,15 @@ class SpiderStopperException(Exception):
     Ошибка остановщика парсера
     """
 
-class SpiderStopper:
-    def __init__(self, params: dict):
+class SpiderStopper(object):
+    def __init__(self, params):
         """Инициализация параметров остановщика
 
         :param params: словарь, в котором содержатся параметры, согласно котороым можно
         сделать вывод о том, что парсинг пора остановить
         """
 
-    def should_we_stop_spider(self, **kargs) -> bool:
+    def should_we_stop_spider(self, **kargs):
         raise NotImplementedError
 
 
@@ -21,11 +23,11 @@ class ItemsCountSpiderStopper(SpiderStopper):
     """
     Завершение работы по количеству собранных требуемых элементов
     """
-    def __init__(self, params: dict):
-        super().__init__(params)
+    def __init__(self, params):
+        super(ItemsCountSpiderStopper, self).__init__(params)
         self.max_items_count = params.get('max_items_count', 0)
 
-    def should_we_stop_spider(self, **kwargs) -> bool:
+    def should_we_stop_spider(self, **kwargs):
         if 'items' not in kwargs:
             raise SpiderStopperException('items not found in arguments')
         else:
@@ -41,11 +43,11 @@ class PostPublicationDateStopper(SpiderStopper):
     Завершение работы по дате публикации поста
     """
 
-    def __init__(self, params: dict):
-        super().__init__(params)
+    def __init__(self, params):
+        super(PostPublicationDateStopper, self).__init__(params)
         self.oldest_publication_date = params.get('oldest_publication_date')
 
-    def should_we_stop_spider(self, **kwargs) -> bool:
+    def should_we_stop_spider(self, **kwargs):
         if 'publication_date_in_epoch' not in kwargs:
             raise SpiderStopperException('publication_date_in_epoch not found in arguments')
         else:

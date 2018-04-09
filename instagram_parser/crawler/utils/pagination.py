@@ -1,6 +1,9 @@
+# -*- coding: utf-8 -*-
+
 import re
 import json
-from urllib.parse import urlencode, urljoin
+from urllib import urlencode
+from urlparse import urljoin
 from collections import OrderedDict
 
 import requests
@@ -11,7 +14,7 @@ class PaginationException(Exception):
     Ошибки пагинации
     """
 
-class Paginator:
+class Paginator(object):
     """
     Пагинация
     """
@@ -21,21 +24,20 @@ class Paginator:
         self.base_url = base_url
         self.location_id = location_id
 
-    def get_last_post_id(self, shared_data: dict) -> str:
+    def get_last_post_id(self, shared_data):
         """
         Получение id последнего поста на текущей странице, для того, чтобы сформировать
         запрос на следующую страниццу в пагинации
         """
         raise NotImplementedError
 
-    def pagination_has_next_page(self, shared_data: dict) -> bool:
+    def pagination_has_next_page(self, shared_data):
         """
         Проверка пагинации на предмет наличия следующей страницы
         """
         raise NotImplementedError
 
-    def get_url_for_next_page(self, response: scrapy.http.Response,
-                              shared_data: dict) -> scrapy.http.Request:
+    def get_url_for_next_page(self, response, shared_data):
         if 'query_hash' not in response.request.meta:
             query_hash = self.get_query_hash(response)
             response.request.meta['query_hash'] = query_hash
@@ -49,7 +51,7 @@ class Paginator:
 
         return url
 
-    def get_query_hash(self, response: scrapy.http.Response):
+    def get_query_hash(self, response):
         """
         :param response: индексная страница для постов в заданной локации
         :return:
@@ -60,13 +62,13 @@ class Paginator:
 
         return query_hash
 
-    def get_link_for_js_file_with_queryhash(self, response: scrapy.http.Response):
+    def get_link_for_js_file_with_queryhash(self, response):
         link = response.xpath(
             '//link[contains(@href, "/static/bundles/LocationPageContainer.js")]/@href').extract_first()
 
         return link
 
-    def get_queryhash_from_js_source(self, page_source: str):
+    def get_queryhash_from_js_source(self, page_source):
         pattern = r'(?P<text_before>locationPosts\.byLocationId\.get\(e\)\.pagination},queryId:\")(?P<query_hash>.*?)(\",queryParams)'
         match = re.search(pattern, page_source)
         if match:
@@ -78,7 +80,7 @@ class Paginator:
 
 class PaginatorInFirstPage(Paginator):
 
-    def get_last_post_id(self, shared_data: dict) -> str:
+    def get_last_post_id(self, shared_data):
         try:
             last_post_id = shared_data.get('entry_data', {}).get('LocationsPage', )[0].get(
                 'location', {}).get('media', {}).get('page_info', {}).get('end_cursor')
@@ -88,7 +90,7 @@ class PaginatorInFirstPage(Paginator):
             raise PaginationException('Can not get last post id (end_cursor) from shared_data')
         return last_post_id
 
-    def pagination_has_next_page(self, shared_data: dict) -> bool:
+    def pagination_has_next_page(self, shared_data):
         try:
             pagination_has_next_page = shared_data.get('entry_data', {}).get('LocationsPage', )[
                 0].get('location', {}).get('media', {}).get('page_info', {}).get('has_next_page')
@@ -102,7 +104,7 @@ class PaginatorInFirstPage(Paginator):
 
 class PaginatorInNextPage(Paginator):
 
-    def get_last_post_id(self, shared_data: dict) -> str:
+    def get_last_post_id(self, shared_data):
         try:
             last_post_id = shared_data.get('data', {}).get('location', {}).get(
                 'edge_location_to_media', {}).get('page_info', {}).get('end_cursor')
@@ -112,7 +114,7 @@ class PaginatorInNextPage(Paginator):
             raise PaginationException('Can not get last post id (end_cursor) from shared_data')
         return last_post_id
 
-    def pagination_has_next_page(self, shared_data: dict) -> bool:
+    def pagination_has_next_page(self, shared_data):
         try:
             pagination_has_next_page = shared_data.get('data', {}).get('location', {}).get(
                 'edge_location_to_media', {}).get('page_info', {}).get('has_next_page')

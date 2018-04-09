@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import json
 import datetime
 
@@ -9,7 +11,7 @@ from instagram_parser.crawler.utils.spider_stopper import (PostPublicationDateSt
                                                            ItemsCountSpiderStopper)
 
 
-def parse_instagram(location_id: str, date_from: datetime.datetime, date_till: datetime.datetime, max_items=None):
+def parse_instagram(location_id, date_from, date_till, max_items=None):
     process = CrawlerProcess(
         {
             'LOG_FILE': 'parser_logs.log',
