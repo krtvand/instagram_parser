@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from instagram_parser.crawler.utils.spider_stopper import ItemsCountSpiderStopper
 
 import unittest

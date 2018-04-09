@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
+
 import unittest
-from unittest.mock import MagicMock
+from mock import MagicMock
 import json
 
 import requests_mock
@@ -54,7 +56,7 @@ class TestPaginator(TestPaginatorBase, unittest.TestCase):
 
     def test_get_link_for_js_file_with_queryhash(self):
         link = self.paginator.get_link_for_js_file_with_queryhash(self.response)
-        self.assertTrue(isinstance(link, str))
+        self.assertTrue(isinstance(link, unicode))
         self.assertEqual("/static/bundles/LocationPageContainer.js/0a8e5b85842a.js", link)
 
     def test_get_queryhash_from_js_source(self):
