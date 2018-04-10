@@ -33,12 +33,12 @@ class TestIndexPageParser(unittest.TestCase):
         self.assertDictEqual(json.loads(self.new_posts)[0], post_objects[0])
 
     def test_collect_data_from_post(self):
-        expected_post_id = '1720482878935489581'
+        expected_post_id = '1754649737996730763'
         expected_post_data = {
-            'owner_id': '2085484199',
-            'shortcode': 'BfgYhAZF1wt',
+            'owner_id': '1750329502',
+            'shortcode': 'BhZxKPihwGL',
             # 22 February 2018 г., 16:39:23
-            'publication_date': 1519317563
+            'publication_date': 1523390570
         }
         expected = {expected_post_id: expected_post_data}
 

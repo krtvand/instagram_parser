@@ -72,7 +72,7 @@ class TestFirstPagePaginator(TestPaginatorBase, unittest.TestCase):
         self.shared_data_as_dict = json.loads(self.shared_data)
 
     def test_get_last_post_id(self):
-        EXPECTED_ID = '1718895412364831673'
+        EXPECTED_ID = '1754578475498250894'
         last_post_id = self.paginator.get_last_post_id(self.shared_data_as_dict)
         self.assertEqual(EXPECTED_ID, last_post_id)
 

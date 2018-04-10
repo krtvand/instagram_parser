@@ -82,8 +82,8 @@ class PaginatorInFirstPage(Paginator):
 
     def get_last_post_id(self, shared_data):
         try:
-            last_post_id = shared_data.get('entry_data', {}).get('LocationsPage', )[0].get(
-                'location', {}).get('media', {}).get('page_info', {}).get('end_cursor')
+            last_post_id = shared_data.get('entry_data', {}).get('LocationsPage')[0].get('graphql', {}).\
+                get('location', {}).get('edge_location_to_media', {}).get('page_info', {}).get('end_cursor')
             if not last_post_id:
                 raise Exception
         except Exception:
@@ -92,8 +92,8 @@ class PaginatorInFirstPage(Paginator):
 
     def pagination_has_next_page(self, shared_data):
         try:
-            pagination_has_next_page = shared_data.get('entry_data', {}).get('LocationsPage', )[
-                0].get('location', {}).get('media', {}).get('page_info', {}).get('has_next_page')
+            pagination_has_next_page = shared_data.get('entry_data', {}).get('LocationsPage')[0].get('graphql', {}).\
+                get('location', {}).get('edge_location_to_media', {}).get('page_info', {}).get('has_next_page')
             if pagination_has_next_page is None:
                 raise Exception
         except Exception:
