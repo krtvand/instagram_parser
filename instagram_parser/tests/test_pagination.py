@@ -39,10 +39,9 @@ class TestPaginator(TestPaginatorBase, unittest.TestCase):
     @requests_mock.Mocker()
     def test_get_queryhash(self, m):
         m.get('https://www.instagram.com/static/bundles/LocationPageContainer.js/0a8e5b85842a.js',
-              text=self.source_of_js_with_queryhash)
-        EXPECTED_QUERYHASH = '951c979213d7e7a1cf1d73e2f661cbd1'
+              text=self.source_of_js_with_queryhash.decode('utf-8'))
+        EXPECTED_QUERYHASH = u'951c979213d7e7a1cf1d73e2f661cbd1'
         query_hash = self.paginator.get_query_hash(self.response)
-        self.assertTrue(isinstance(query_hash, str))
         self.assertEqual(EXPECTED_QUERYHASH, query_hash)
 
     def test_get_url_for_next_page(self):
