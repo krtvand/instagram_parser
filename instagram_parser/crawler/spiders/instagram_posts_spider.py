@@ -14,6 +14,9 @@ from instagram_parser.crawler.utils.posts_filter import PostFilter
 from instagram_parser.crawler.data_extractors.post_detail_page_data_extractor import PostDetailPageDataExtractor
 
 
+QUERY_LOCATION_VARS = '{{"id":"{0}","first":12,"after":"{1}"}}'
+
+
 class InstagramPostsSpider(scrapy.Spider):
     name = 'instagram_posts_spider'
     base_url = 'https://www.instagram.com'
@@ -32,6 +35,7 @@ class InstagramPostsSpider(scrapy.Spider):
         self.post_filter = posts_filter
         self.paginator = None
         self.page_parser = None
+        self.rhx_gis = None
 
         super(InstagramPostsSpider, self).__init__(*args, **kwargs)
 
@@ -70,12 +74,11 @@ class InstagramPostsSpider(scrapy.Spider):
 
         if self.paginator.pagination_has_next_page(shared_data):
             next_page_url = self.paginator.get_url_for_next_page(response, shared_data)
-            QUERY_LOCATION_VARS = '{{"id":"{0}","first":12,"after":"{1}"}}'
+
             after = self.paginator.get_last_post_id(shared_data)
             params = QUERY_LOCATION_VARS.format(self.location_id, after)
-            rhx_gis = shared_data['rhx_gis']
-            data = rhx_gis + ":" + params
-
+            self.rhx_gis = shared_data['rhx_gis']
+            data = self.rhx_gis + ":" + params
             x_instagram_gis = hashlib.md5(data).hexdigest()
             headers = {'x-requested-with': 'XMLHttpRequest', 'x-instagram-gis': x_instagram_gis}
             meta = response.request.meta
@@ -111,7 +114,11 @@ class InstagramPostsSpider(scrapy.Spider):
 
         if self.paginator.pagination_has_next_page(shared_data):
             next_page_url = self.paginator.get_url_for_next_page(response, shared_data)
-            headers = {'x-requested-with': 'XMLHttpRequest'}
+            after = self.paginator.get_last_post_id(shared_data)
+            params = QUERY_LOCATION_VARS.format(self.location_id, after)
+            data = self.rhx_gis + ":" + params
+            x_instagram_gis = hashlib.md5(data).hexdigest()
+            headers = {'x-requested-with': 'XMLHttpRequest', 'x-instagram-gis': x_instagram_gis}
             meta = response.request.meta
             yield Request(next_page_url, headers=headers, meta=meta, callback=self.parse_next_page)
         else:
