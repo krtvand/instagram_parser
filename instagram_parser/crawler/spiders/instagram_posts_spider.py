@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 #TODO 429 http error - to many requests
+import hashlib
 
 import scrapy
 from scrapy import Request
@@ -58,7 +59,7 @@ class InstagramPostsSpider(scrapy.Spider):
             (post_id, post_info), = post_data.items()
             if self.spider_stoper.should_we_stop_spider(publication_date_in_epoch=post_info['publication_date'],
                                                         items=self.posts_info):
-                return
+                yield self.posts_info
             if self.post_filter.must_be_discarded(post_data):
                 continue
             self.posts_info.update(post_data)
@@ -69,11 +70,22 @@ class InstagramPostsSpider(scrapy.Spider):
 
         if self.paginator.pagination_has_next_page(shared_data):
             next_page_url = self.paginator.get_url_for_next_page(response, shared_data)
-            headers = {'x-requested-with': 'XMLHttpRequest'}
+            QUERY_LOCATION_VARS = '{{"id":"{0}","first":12,"after":"{1}"}}'
+            after = self.paginator.get_last_post_id(shared_data)
+            params = QUERY_LOCATION_VARS.format(self.location_id, after)
+            rhx_gis = shared_data['rhx_gis']
+            data = rhx_gis + ":" + params
+
+            x_instagram_gis = hashlib.md5(data).hexdigest()
+            headers = {'x-requested-with': 'XMLHttpRequest', 'x-instagram-gis': x_instagram_gis}
             meta = response.request.meta
             yield Request(next_page_url, headers=headers, meta=meta, callback=self.parse_next_page)
         else:
-            return
+            yield self.posts_info
+
+    def get_ig_gis(self, params, rhx_gis):
+        vals = rhx_gis + ":" + params
+        return hashlib.md5(vals.encode()).hexdigest()
 
 
     def parse_next_page(self, response):

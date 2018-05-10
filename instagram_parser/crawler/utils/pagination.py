@@ -64,7 +64,7 @@ class Paginator(object):
 
     def get_link_for_js_file_with_queryhash(self, response):
         link = response.xpath(
-            '//link[contains(@href, "/static/bundles/LocationPageContainer.js")]/@href').extract_first()
+            '//link[contains(@href, "/static/bundles/base/LocationPageContainer.js")]/@href').extract_first()
 
         return link
 

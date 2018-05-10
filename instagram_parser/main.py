@@ -40,7 +40,8 @@ if __name__ == '__main__':
     date_till = datetime.datetime.utcnow() - datetime.timedelta(minutes=10)
     location_id = '224829075'
 
-    result = parse_instagram(location_id=location_id, date_from=date_from, date_till=date_till, max_items=3)
+    result = parse_instagram(location_id=location_id, date_from=date_from, date_till=date_till, max_items=30)
+    # result = parse_instagram(location_id=location_id, date_from=date_from, date_till=date_till)
     print(json.dumps(result))
 
     with open('parsing_results', 'w') as f:
