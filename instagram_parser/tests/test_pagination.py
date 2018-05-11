@@ -56,7 +56,7 @@ class TestPaginator(TestPaginatorBase, unittest.TestCase):
     def test_get_link_for_js_file_with_queryhash(self):
         link = self.paginator.get_link_for_js_file_with_queryhash(self.response)
         self.assertTrue(isinstance(link, unicode))
-        self.assertEqual("/static/bundles/LocationPageContainer.js/0a8e5b85842a.js", link)
+        self.assertEqual("/static/bundles/base/LocationPageContainer.js/0a8e5b85842a.js", link)
 
     def test_get_queryhash_from_js_source(self):
         EXPECTED_QUERYHASH = '951c979213d7e7a1cf1d73e2f661cbd1'
