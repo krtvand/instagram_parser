@@ -1,5 +1,6 @@
     {
       "activity_counts": null,
+      "rhx_gis": "510a7a8c35c8837193fbc929e20e1824",
       "config": {
         "csrf_token": "XHKfXb7wNe9iHJ9FMFr0IT56Achsdni0",
         "viewer": null

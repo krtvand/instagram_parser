@@ -9,6 +9,8 @@ from collections import OrderedDict
 import requests
 import scrapy
 
+from instagram_parser.crawler.utils.headers_manager import FirstPagePaginationHeadersManager
+
 class PaginationException(Exception):
     """
     Ошибки пагинации
@@ -19,10 +21,18 @@ class Paginator(object):
     Пагинация
     """
     pagination_url = '/graphql/query/'
+    pagination_uri_variables_template = '{{"id":"{id}","first":12,"after":"{after}"}}'
 
     def __init__(self, base_url, location_id):
         self.base_url = base_url
         self.location_id = location_id
+        # self.headers_manager = headers_manager
+
+    def get_headers(self, shared_data):
+        rhx_gis = shared_data['rhx_gis']
+        variables = self.get_variables_for_pagination_uri(shared_data)
+        headers = FirstPagePaginationHeadersManager(rhx_gis=rhx_gis, pagination_uri_variables=variables).get_headers()
+        return headers
 
     def get_last_post_id(self, shared_data):
         """
@@ -43,13 +53,16 @@ class Paginator(object):
             response.request.meta['query_hash'] = query_hash
         else:
             query_hash = response.request.meta['query_hash']
-        after = self.get_last_post_id(shared_data)
-        params_as_dict = OrderedDict([("id", self.location_id), ("first", 12), ("after", after)])
-        variables = json.dumps(params_as_dict).replace(' ', '')
+        variables = self.get_variables_for_pagination_uri(shared_data)
         params = urlencode([('query_hash', query_hash), ('variables', variables)])
         url = urljoin(self.base_url, self.pagination_url) + '?' + params
 
         return url
+
+    def get_variables_for_pagination_uri(self, shared_data):
+        after = self.get_last_post_id(shared_data)
+        variables = self.pagination_uri_variables_template.format(id=self.location_id, after=after)
+        return variables
 
     def get_query_hash(self, response):
         """

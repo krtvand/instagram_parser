@@ -70,6 +70,14 @@ class TestFirstPagePaginator(TestPaginatorBase, unittest.TestCase):
         self.shared_data = load_text_from_file(self.SHARED_DATA_FILE)
         self.shared_data_as_dict = json.loads(self.shared_data)
 
+    def test_get_headers(self):
+        headers = self.paginator.get_headers(self.shared_data_as_dict)
+        expected_headers = {
+            'x-requested-with': 'XMLHttpRequest',
+            'x-instagram-gis': '44da33c4e4f2e441da0b845bb0128161'
+        }
+        self.assertEqual(expected_headers, headers)
+
     def test_get_last_post_id(self):
         EXPECTED_ID = '1754578475498250894'
         last_post_id = self.paginator.get_last_post_id(self.shared_data_as_dict)
@@ -89,6 +97,14 @@ class TestNextPagePaginator(TestPaginatorBase, unittest.TestCase):
         self.paginator = PaginatorInNextPage(self.base_url, self.LOCATION_ID)
         self.shared_data = load_text_from_file(self.NEXT_PAGE_SOURCE)
         self.shared_data_as_dict = json.loads(self.shared_data)
+
+    def test_get_headers(self):
+        headers = self.paginator.get_headers(self.shared_data_as_dict)
+        expected_headers = {
+            'x-requested-with': 'XMLHttpRequest',
+            'x-instagram-gis': '302b579bfc5fa8c3e409761834bc895e'
+        }
+        self.assertEqual(expected_headers, headers)
 
     def test_get_last_post_id(self):
         EXPECTED_ID = '1718108885371697130'
