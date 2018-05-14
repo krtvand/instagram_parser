@@ -2,11 +2,33 @@
 
 import unittest
 import json
+from mock import MagicMock
 
 from instagram_parser.crawler.data_extractors.next_page_data_extractor import (NextPageDataExtractor)
 from instagram_parser.crawler.data_extractors.first_page_data_extractor import (FirstPageDataExtractor)
-from instagram_parser.tests.utils import (load_text_from_file,
-                                                    fake_scrapy_response_from_file)
+from instagram_parser.tests.utils import (
+    load_text_from_file,
+    fake_scrapy_response_from_file
+)
+
+
+class TestPublicationsByTagsFirstPageDataExtracor(unittest.TestCase):
+    def setUp(self):
+        page_source = 'source_data/publications_by_tags/index_page_source.html'
+        shared_data_from_index_page_json = 'source_data/publications_by_tags/shared_data_from_index_page.json'
+        new_posts_from_index_page_json = 'source_data/publications_by_tags/new_posts_from_index_page.json'
+        self.response = fake_scrapy_response_from_file(file_name=page_source)
+        self.shared_data_str = load_text_from_file(shared_data_from_index_page_json)
+        self.shared_data_dict = json.loads(self.shared_data_str)
+        self.new_posts_str = load_text_from_file(new_posts_from_index_page_json)
+        self.new_posts_dict = json.loads(self.new_posts_str)
+        self.parser = MagicMock()
+        self.parser.get_page_info_from_json = MagicMock(return_value={})
+
+    def test_get_shared_data(self):
+        shared_data = self.parser.get_page_info_from_json(self.response)
+        self.assertTrue(isinstance(shared_data, dict))
+        self.assertTrue('entry_data' in shared_data)
 
 class TestIndexPageParser(unittest.TestCase):
 
