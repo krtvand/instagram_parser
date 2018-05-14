@@ -7,7 +7,7 @@ import requests_mock
 
 from instagram_parser.tests.utils import (fake_scrapy_response_from_file,
                                                     load_text_from_file)
-from instagram_parser.crawler.utils.headers_manager import FirstPagePaginationHeadersManager
+from instagram_parser.crawler.utils.headers_manager import PaginationHeadersManager
 
 class TestPaginatorBase:
     LOCATION_ID = '213526478'
@@ -39,5 +39,5 @@ class TestHeadersManager(TestPaginatorBase, unittest.TestCase):
             'x-requested-with': 'XMLHttpRequest',
             'x-instagram-gis': '302b579bfc5fa8c3e409761834bc895e'
         }
-        headers = FirstPagePaginationHeadersManager(rhx_gis, pagination_uri_variables).get_headers()
+        headers = PaginationHeadersManager(rhx_gis, pagination_uri_variables).get_headers()
         self.assertEqual(expected_headers, headers)

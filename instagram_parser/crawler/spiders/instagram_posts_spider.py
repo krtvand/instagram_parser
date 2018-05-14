@@ -74,22 +74,12 @@ class InstagramPostsSpider(scrapy.Spider):
 
         if self.paginator.pagination_has_next_page(shared_data):
             next_page_url = self.paginator.get_url_for_next_page(response, shared_data)
-
-            after = self.paginator.get_last_post_id(shared_data)
-            params = QUERY_LOCATION_VARS.format(self.location_id, after)
+            headers = self.paginator.get_headers(shared_data)
             self.rhx_gis = shared_data['rhx_gis']
-            data = self.rhx_gis + ":" + params
-            x_instagram_gis = hashlib.md5(data).hexdigest()
-            headers = {'x-requested-with': 'XMLHttpRequest', 'x-instagram-gis': x_instagram_gis}
             meta = response.request.meta
             yield Request(next_page_url, headers=headers, meta=meta, callback=self.parse_next_page)
         else:
             yield self.posts_info
-
-    def get_ig_gis(self, params, rhx_gis):
-        vals = rhx_gis + ":" + params
-        return hashlib.md5(vals.encode()).hexdigest()
-
 
     def parse_next_page(self, response):
         self.set_paginator('next_page_paginator')
@@ -114,11 +104,7 @@ class InstagramPostsSpider(scrapy.Spider):
 
         if self.paginator.pagination_has_next_page(shared_data):
             next_page_url = self.paginator.get_url_for_next_page(response, shared_data)
-            after = self.paginator.get_last_post_id(shared_data)
-            params = QUERY_LOCATION_VARS.format(self.location_id, after)
-            data = self.rhx_gis + ":" + params
-            x_instagram_gis = hashlib.md5(data).hexdigest()
-            headers = {'x-requested-with': 'XMLHttpRequest', 'x-instagram-gis': x_instagram_gis}
+            headers = self.paginator.get_headers(shared_data, self.rhx_gis)
             meta = response.request.meta
             yield Request(next_page_url, headers=headers, meta=meta, callback=self.parse_next_page)
         else:

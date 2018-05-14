@@ -9,7 +9,7 @@ from collections import OrderedDict
 import requests
 import scrapy
 
-from instagram_parser.crawler.utils.headers_manager import FirstPagePaginationHeadersManager
+from instagram_parser.crawler.utils.headers_manager import PaginationHeadersManager
 
 class PaginationException(Exception):
     """
@@ -27,12 +27,6 @@ class Paginator(object):
         self.base_url = base_url
         self.location_id = location_id
         # self.headers_manager = headers_manager
-
-    def get_headers(self, shared_data):
-        rhx_gis = shared_data['rhx_gis']
-        variables = self.get_variables_for_pagination_uri(shared_data)
-        headers = FirstPagePaginationHeadersManager(rhx_gis=rhx_gis, pagination_uri_variables=variables).get_headers()
-        return headers
 
     def get_last_post_id(self, shared_data):
         """
@@ -93,6 +87,12 @@ class Paginator(object):
 
 class PaginatorInFirstPage(Paginator):
 
+    def get_headers(self, shared_data):
+        rhx_gis = shared_data['rhx_gis']
+        variables = self.get_variables_for_pagination_uri(shared_data)
+        headers = PaginationHeadersManager(rhx_gis=rhx_gis, pagination_uri_variables=variables).get_headers()
+        return headers
+
     def get_last_post_id(self, shared_data):
         try:
             last_post_id = shared_data.get('entry_data', {}).get('LocationsPage')[0].get('graphql', {}).\
@@ -116,6 +116,11 @@ class PaginatorInFirstPage(Paginator):
 
 
 class PaginatorInNextPage(Paginator):
+
+    def get_headers(self, shared_data, rhx_gis):
+        variables = self.get_variables_for_pagination_uri(shared_data)
+        headers = PaginationHeadersManager(rhx_gis=rhx_gis, pagination_uri_variables=variables).get_headers()
+        return headers
 
     def get_last_post_id(self, shared_data):
         try:

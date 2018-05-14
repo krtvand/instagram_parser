@@ -4,8 +4,15 @@ import hashlib
 class HeadersManager(object):
     def get_headers(self):
         raise NotImplementedError
+#
+# class HeaderClass(object):
+#     def set_headers(self):
+#         self.headers
+#
+# class AjaxHeadersClass(HeadersManager)
 
-class FirstPagePaginationHeadersManager(HeadersManager):
+
+class PaginationHeadersManager(HeadersManager):
     def __init__(self, rhx_gis, pagination_uri_variables):
         self.rhx_gis = rhx_gis
         self.pagination_uri_variables = pagination_uri_variables
