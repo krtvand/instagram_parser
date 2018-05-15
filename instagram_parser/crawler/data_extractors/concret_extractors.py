@@ -22,6 +22,15 @@ class SharedDataExtractorFromBodyScript(SharedDataExtractor):
 
         return shared_data_dict
 
+class ResponseIsSharedDataExtractor(SharedDataExtractor):
+    def get_page_info_from_json(self, response):
+        """
+        Следующая страница при пагинации запрашивается через ajax запрос и в ответ
+        приходит чистый json
+        """
+        next_page__data_as_dict = json.loads(response.text)
+        return next_page__data_as_dict
+
 
 class PostsListExtractor(object):
     def get_post_objects(self, shared_data):
@@ -42,6 +51,24 @@ class PublicationsByLocationIndexPagePostsListExtractor(PostsListExtractor):
     def _fetch_posts(self, shared_data):
         posts_list = shared_data.get('entry_data', {}).get('LocationsPage')[0].get('graphql', {}). \
             get('location', {}).get('edge_location_to_media', {}).get('edges', [])
+        return posts_list
+
+class PublicationsByLocationNextPagePostsListExtractor(PostsListExtractor):
+    def _fetch_posts(self, shared_data):
+        posts_list = shared_data.get('data', {}).get('location', {}).get(
+            'edge_location_to_media', {}).get('edges', [])
+        return posts_list
+
+class PublicationsByTagIndexPagePostsListExtractor(PostsListExtractor):
+    def _fetch_posts(self, shared_data):
+        posts_list = shared_data.get('entry_data', {}).get('TagPage')[0].get('graphql', {}). \
+            get('hashtag', {}).get('edge_hashtag_to_media', {}).get('edges', [])
+        return posts_list
+
+class PublicationsByTagNextPagePostsListExtractor(PostsListExtractor):
+    def _fetch_posts(self, shared_data):
+        posts_list = shared_data.get('data', {}).get('hashtag', {}). \
+            get('edge_hashtag_to_media', {}).get('edges', [])
         return posts_list
 
 

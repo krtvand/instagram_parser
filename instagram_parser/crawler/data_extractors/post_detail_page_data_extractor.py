@@ -7,7 +7,6 @@ from instagram_parser.crawler.data_extractors.concret_extractors import (
     PublicationsByLocationIndexPagePostsListExtractor,
     PostDetailPagePostDataExtractor
 )
-from instagram_parser.crawler.data_extractors.first_page_data_extractor import DataExtractorException
 from instagram_parser.crawler.data_extractors.first_page_data_extractor import PublicationsPageDataExtractor
 
 class PostDetailPageDataExtractor(PublicationsPageDataExtractor):
