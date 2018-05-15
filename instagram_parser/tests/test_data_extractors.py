@@ -4,13 +4,13 @@ import unittest
 import json
 from mock import MagicMock
 
-from instagram_parser.crawler.data_extractors.next_page_data_extractor import (NextPageDataExtractor)
+from instagram_parser.crawler.data_extractors.next_page_data_extractor import (PublicationsByLocationNextPageDataExtractor)
 from instagram_parser.crawler.data_extractors.first_page_data_extractor import (FirstPageDataExtractor)
 from instagram_parser.crawler.data_extractors.publications_by_tags_extractors.index_page_data_extractor import (
     IndexPageDataExtractor
 )
 from instagram_parser.crawler.data_extractors.publications_by_tags_extractors.next_page_data_extractor import (
-    NextPageDataExtractor as PublicationByTagsNextPageDataExtractor
+    PublicationsByTagNextPageDataExtractor as PublicationByTagsNextPageDataExtractor
 )
 from instagram_parser.tests.utils import (
     load_text_from_file,
@@ -115,6 +115,18 @@ class TestPublicationByTagNextPageDataExtractor(unittest.TestCase):
         self.assertEqual(len(post_objects), POSTS_NUMBER_FROM_NEXT_PAGE)
         self.assertDictEqual(self.new_posts_list[0], post_objects[0])
 
+    def test_collect_data_from_post(self):
+        expected_post_id = '1778449507845220452'
+        expected_post_data = {
+            'owner_id': '7073053083',
+            'shortcode': 'BiuUmeeFShk',
+            'publication_date': 1526227724
+        }
+        expected = {expected_post_id: expected_post_data}
+        post = self.new_posts_list[0]
+        data = self.data_extractor.collect_data_from_post(post)
+        self.assertDictEqual(expected, data)
+
 
 class TestNextPageParser(unittest.TestCase):
 
@@ -125,7 +137,7 @@ class TestNextPageParser(unittest.TestCase):
         self.next_page_data_str = load_text_from_file(NEXT_PAGE_SOURCE)
         self.next_page_data_as_dict = json.loads(self.next_page_data_str)
         self.new_posts = load_text_from_file(NEXT_PAGE_POSTS)
-        self.parser = NextPageDataExtractor()
+        self.parser = PublicationsByLocationNextPageDataExtractor()
 
     def test_extract_data_from_next_page(self):
         next_page_data_dict = self.parser.get_page_info_from_json(self.response)

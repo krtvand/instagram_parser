@@ -2,16 +2,24 @@
 
 import json
 
-import scrapy
-
-from instagram_parser.crawler.data_extractors.base import (LocationPageDataExtractor,
+from instagram_parser.crawler.data_extractors.concret_extractors import (
+    SharedDataExtractorFromBodyScript,
+    PublicationsByLocationIndexPagePostsListExtractor,
+    PublicationsByLocationPostDataExtractor
+)
+from instagram_parser.crawler.data_extractors.base import (PublicationsPageDataExtractor,
                                                            DataExtractorException)
 
 
-class NextPageDataExtractor(LocationPageDataExtractor):
+class PublicationsByLocationNextPageDataExtractor(PublicationsPageDataExtractor):
     """
     Парсер данных со страницы, полученной после запроса следующей страницы из пагинации
     """
+    def set_concret_extractors(self):
+        # self.shared_data_extractor = SharedDataExtractorFromBodyScript()
+        # self.posts_list_extractor = PublicationsByLocationIndexPagePostsListExtractor()
+        self.post_data_extractor = PublicationsByLocationPostDataExtractor()
+
     def get_page_info_from_json(self, response):
         """
         Следующая страница при пагинации запрашивается через ajax запрос и в ответ

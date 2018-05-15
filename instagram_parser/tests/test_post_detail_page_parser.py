@@ -16,11 +16,6 @@ class TestIndexPageParser(unittest.TestCase):
         self.page_data_as_dict = json.loads(load_text_from_file(PAGE_SOURCE_FILE_NAME))
         self.parser = PostDetailPageDataExtractor()
 
-    def test_get_owner_username(self):
-        post_owner_username = self.parser.get_owner_username(self.page_data_as_dict)
-        expected = 'etsu_real'
-        self.assertEqual(expected, post_owner_username)
-
     def test_collect_data_from_post(self):
         expected_post_id = '1724081323683765859'
         expected_post_data = {
