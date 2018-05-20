@@ -5,28 +5,25 @@
 import scrapy
 from scrapy import Request
 
-from instagram_parser.crawler.utils.pagination import (PaginatorInFirstPage, PaginatorInNextPage)
-from instagram_parser.crawler.data_extractors.publications_by_location.next_page_data_extractor import PublicationsByLocationNextPageDataExtractor
-from instagram_parser.crawler.data_extractors.publications_by_location.first_page_data_extractor import FirstPageDataExtractor
+from instagram_parser.crawler.utils.pagination import (PublicationsByTagPaginatorInFirstPage, PaginatorInNextPage)
+from instagram_parser.crawler.data_extractors.publications_by_tags_extractors.next_page_data_extractor import PublicationsByTagNextPageDataExtractor
+from instagram_parser.crawler.data_extractors.publications_by_tags_extractors.index_page_data_extractor import IndexPageDataExtractor
 from instagram_parser.crawler.data_extractors.post_detail_page_data_extractor import PostDetailPageDataExtractor
 
 
-QUERY_LOCATION_VARS = '{{"id":"{0}","first":12,"after":"{1}"}}'
-
-
 class InstagramPostsSpider(scrapy.Spider):
-    name = 'instagram_posts_spider'
+    name = 'publications_by_tag_spider'
     base_url = 'https://www.instagram.com'
 
-    def __init__(self, location_id, spider_stopper, posts_filter,
+    def __init__(self, tag, spider_stopper, posts_filter,
                  result, *args, **kwargs):
         """
         :param spider_stopper: Остановщик парсера
         :param posts_filter: Фильтровщик постов (например по дате публикации)
         :param result: Результат работы парсера сохраняем в аргумент, переданный при запуске
         """
-        self.location_id = location_id
-        self.start_urls = ['{}/explore/locations/{}/'.format(self.base_url, self.location_id)]
+        self.tag = tag
+        self.start_urls = ['{}/explore/tags/{}/'.format(self.base_url, self.tag)]
         self.posts_info = result
         self.spider_stoper = spider_stopper
         self.post_filter = posts_filter
@@ -38,15 +35,15 @@ class InstagramPostsSpider(scrapy.Spider):
 
     def set_paginator(self, paginator_type):
         paginators = {
-            'index_page_paginator': PaginatorInFirstPage(self.base_url, self.location_id),
-            'next_page_paginator': PaginatorInNextPage(self.base_url, self.location_id)
+            'index_page_paginator': PaginatorInFirstPage(self.base_url, self.tag),
+            'next_page_paginator': PaginatorInNextPage(self.base_url, self.tag)
         }
         self.paginator = paginators[paginator_type]
 
     def set_page_parser(self, parser_type):
         parsers = {
-            'index_page_parser': FirstPageDataExtractor(),
-            'next_page_parser': PublicationsByLocationNextPageDataExtractor()
+            'index_page_parser': IndexPageDataExtractor(),
+            'next_page_parser': PublicationsByTagNextPageDataExtractor()
         }
         self.page_parser = parsers[parser_type]
 

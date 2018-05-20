@@ -2,10 +2,9 @@
 
 import unittest
 import json
-from mock import MagicMock
 
-from instagram_parser.crawler.data_extractors.next_page_data_extractor import (PublicationsByLocationNextPageDataExtractor)
-from instagram_parser.crawler.data_extractors.first_page_data_extractor import (FirstPageDataExtractor)
+from instagram_parser.crawler.data_extractors.publications_by_location.next_page_data_extractor import (PublicationsByLocationNextPageDataExtractor)
+from instagram_parser.crawler.data_extractors.publications_by_location.first_page_data_extractor import (FirstPageDataExtractor)
 from instagram_parser.crawler.data_extractors.publications_by_tags_extractors.index_page_data_extractor import (
     IndexPageDataExtractor
 )
