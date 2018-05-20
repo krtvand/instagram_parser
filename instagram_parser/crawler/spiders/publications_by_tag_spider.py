@@ -5,13 +5,13 @@
 import scrapy
 from scrapy import Request
 
-from instagram_parser.crawler.utils.pagination import (PublicationsByTagPaginatorInFirstPage, PaginatorInNextPage)
+from instagram_parser.crawler.utils.pagination import (PublicationsByTagPaginatorInFirstPage, PublicationsByTagPaginatorInNextPage)
 from instagram_parser.crawler.data_extractors.publications_by_tags_extractors.next_page_data_extractor import PublicationsByTagNextPageDataExtractor
 from instagram_parser.crawler.data_extractors.publications_by_tags_extractors.index_page_data_extractor import IndexPageDataExtractor
 from instagram_parser.crawler.data_extractors.post_detail_page_data_extractor import PostDetailPageDataExtractor
 
 
-class InstagramPostsSpider(scrapy.Spider):
+class PublicationsByTagSpider(scrapy.Spider):
     name = 'publications_by_tag_spider'
     base_url = 'https://www.instagram.com'
 
@@ -31,12 +31,12 @@ class InstagramPostsSpider(scrapy.Spider):
         self.page_parser = None
         self.rhx_gis = None
 
-        super(InstagramPostsSpider, self).__init__(*args, **kwargs)
+        super(PublicationsByTagSpider, self).__init__(*args, **kwargs)
 
     def set_paginator(self, paginator_type):
         paginators = {
-            'index_page_paginator': PaginatorInFirstPage(self.base_url, self.tag),
-            'next_page_paginator': PaginatorInNextPage(self.base_url, self.tag)
+            'index_page_paginator': PublicationsByTagPaginatorInFirstPage(self.base_url, self.tag),
+            'next_page_paginator': PublicationsByTagPaginatorInNextPage(self.base_url, self.tag)
         }
         self.paginator = paginators[paginator_type]
 
@@ -93,8 +93,7 @@ class InstagramPostsSpider(scrapy.Spider):
             headers = {'x-requested-with': 'XMLHttpRequest'}
 
             yield Request(url='{}/p/{}/?__a=1'.format(self.base_url, post_info['shortcode']),
-                          headers=headers, callback=self.parse_post_detail_page,
-                          meta={'download_timeout': 0})
+                          headers=headers, callback=self.parse_post_detail_page)
 
         if self.paginator.pagination_has_next_page(shared_data):
             next_page_url = self.paginator.get_url_for_next_page(response, shared_data)
