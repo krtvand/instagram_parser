@@ -57,7 +57,7 @@ class PublicationsByTagSpider(scrapy.Spider):
             (post_id, post_info), = post_data.items()
             if self.spider_stoper.should_we_stop_spider(publication_date_in_epoch=post_info['publication_date'],
                                                         items=self.posts_info):
-                yield self.posts_info
+                return
             if self.post_filter.must_be_discarded(post_data):
                 continue
             self.posts_info.update(post_data)
