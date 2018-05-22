@@ -37,3 +37,6 @@ class PublicationsPageDataExtractor(object):
         Шаблонный метод для сбора необходимой информации из поста
         """
         return self.post_data_extractor.collect_data_from_post(post)
+
+    def get_rhx_gis(self, shared_data):
+        return shared_data.get('rhx_gis')
