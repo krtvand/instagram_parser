@@ -71,32 +71,6 @@ class PublicationsByTagSpider(scrapy.Spider):
                                  next_page_parser=self.parse_next_page,
                                  base_url=self.base_url)
         return page_parser.parse(response)
-        # self.set_paginator('next_page_paginator')
-        # self.set_page_parser('next_page_parser')
-        # shared_data = self.page_parser.get_page_info_from_json(response)
-        # posts_list = self.page_parser.get_post_objects(shared_data)
-        # for post in posts_list:
-        #     post_data = self.page_parser.collect_data_from_post(post)
-        #     (post_id, post_info), = post_data.items()
-        #     if self.spider_stoper.should_we_stop_spider(
-        #             publication_date_in_epoch=post_info['publication_date'],
-        #             items=self.posts_info):
-        #         return
-        #     if self.post_filter.must_be_discarded(post_data):
-        #         continue
-        #     self.posts_info.update(post_data)
-        #     headers = {'x-requested-with': 'XMLHttpRequest'}
-        #
-        #     yield Request(url='{}/p/{}/?__a=1'.format(self.base_url, post_info['shortcode']),
-        #                   headers=headers, callback=self.parse_post_detail_page)
-        #
-        # if self.paginator.pagination_has_next_page(shared_data):
-        #     next_page_url = self.paginator.get_url_for_next_page(response, shared_data)
-        #     headers = self.paginator.get_headers(shared_data, self.rhx_gis)
-        #     meta = response.request.meta
-        #     yield Request(next_page_url, headers=headers, meta=meta, callback=self.parse_next_page)
-        # else:
-        #     return
 
     def parse_post_detail_page(self, response):
         """
@@ -165,7 +139,7 @@ class PageParser(object):
             rhx_gis = self.get_rhx_gis()
             self.set_rhx_gis_to_request_meta(response.request.meta)
             headers = self.paginator.get_headers(shared_data, rhx_gis)
-            yield Request(next_page_url, headers=headers, meta=response.request.meta,
+            return Request(next_page_url, headers=headers, meta=response.request.meta,
                           callback=next_page_parser)
         else:
             return
@@ -188,7 +162,7 @@ class IndexPageParser(PageParser):
         request_meta['rhx_gis'] = self.get_rhx_gis()
 
     def get_rhx_gis(self):
-        return self.page_data_extractor.get_rhx_gis()
+        return self.page_data_extractor.get_rhx_gis(self.shared_data)
 
     # def next_page_parser(self, response):
     #     raise NotImplementedError

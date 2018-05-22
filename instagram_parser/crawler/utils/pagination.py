@@ -156,8 +156,7 @@ class PublicationsByTagPaginatorInFirstPage(Paginator):
         self.tag = tag
         # self.headers_manager = headers_manager
 
-    def get_headers(self, shared_data):
-        rhx_gis = shared_data['rhx_gis']
+    def get_headers(self, shared_data, rhx_gis):
         variables = self.get_variables_for_pagination_uri(shared_data)
         headers = PaginationHeadersManager(rhx_gis=rhx_gis, pagination_uri_variables=variables).get_headers()
         return headers
@@ -206,9 +205,16 @@ class PublicationsByTagPaginatorInFirstPage(Paginator):
 
 class PublicationsByTagPaginatorInNextPage(PaginatorInNextPage):
 
+    pagination_uri_variables_template = '{{"tag_name":"{tag_name}","first":12,"after":"{after}"}}'
+
     def __init__(self, base_url, tag):
         self.base_url = base_url
         self.tag = tag
+
+    def get_variables_for_pagination_uri(self, shared_data):
+        after = self.get_last_post_id(shared_data)
+        variables = self.pagination_uri_variables_template.format(tag_name=self.tag, after=after)
+        return variables
 
     def get_last_post_id(self, shared_data):
         try:
