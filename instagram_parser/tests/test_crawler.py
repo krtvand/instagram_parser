@@ -33,6 +33,9 @@ class TestSpiderClientBase:
 
 
 class TestSpiderClient(TestSpiderClientBase, unittest.TestCase):
+    """
+    Не работает
+    """
 
     def setUp(self):
 
