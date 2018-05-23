@@ -32,25 +32,8 @@ class PublicationsByTagSpider(scrapy.Spider):
         self.posts_info = result
         self.spider_stoper = spider_stopper
         self.post_filter = posts_filter
-        self.paginator = None
-        self.page_parser = None
-        self.rhx_gis = None
 
         super(PublicationsByTagSpider, self).__init__(*args, **kwargs)
-
-    def set_paginator(self, paginator_type):
-        paginators = {
-            'index_page_paginator': PublicationsByTagPaginatorInFirstPage(self.base_url, self.tag),
-            'next_page_paginator': PublicationsByTagPaginatorInNextPage(self.base_url, self.tag)
-        }
-        self.paginator = paginators[paginator_type]
-
-    def set_page_parser(self, parser_type):
-        parsers = {
-            'index_page_parser': IndexPageDataExtractor(),
-            'next_page_parser': PublicationsByTagNextPageDataExtractor()
-        }
-        self.page_parser = parsers[parser_type]
 
     def parse(self, response):
         page_parser = IndexPageParser(tag=self.tag,
@@ -96,7 +79,6 @@ class PageParser(object):
         self.next_page_parser = next_page_parser
         self.tag = tag
         self.base_url = base_url
-        self.start_urls = ['{}/explore/tags/{}/'.format(self.base_url, self.tag)]
         self.posts_info = result
         self.spider_stoper = spider_stopper
         self.post_filter = posts_filter
@@ -163,9 +145,6 @@ class IndexPageParser(PageParser):
 
     def get_rhx_gis(self):
         return self.page_data_extractor.get_rhx_gis(self.shared_data)
-
-    # def next_page_parser(self, response):
-    #     raise NotImplementedError
 
 
 class NextPageParser(PageParser):

@@ -57,7 +57,8 @@ class TestPublicationsByTagPaginatorInFirstPage(unittest.TestCase):
         self.assertEqual(EXPECTED_QUERYHASH, query_hash)
 
     def test_get_headers(self):
-        headers = self.paginator.get_headers(self.shared_data_as_dict)
+        rhx_gis = '510a7a8c35c8837193fbc929e20e1824'
+        headers = self.paginator.get_headers(self.shared_data_as_dict, rhx_gis)
         expected_headers = {
             'x-requested-with': 'XMLHttpRequest',
             'x-instagram-gis': 'a8800a3aea75e4e038a42003c3217b48'
@@ -86,11 +87,11 @@ class TestNextPagePaginator(unittest.TestCase):
         self.shared_data_as_dict = json.loads(self.shared_data)
 
     def test_get_headers(self):
-        rhx_gis = 'fb26b33292676d6e1c47d36511fa7996'
+        rhx_gis = '510a7a8c35c8837193fbc929e20e1824'
         headers = self.paginator.get_headers(self.shared_data_as_dict, rhx_gis)
         expected_headers = {
             'x-requested-with': 'XMLHttpRequest',
-            'x-instagram-gis': '3f58c19dee9edff9b9cfeb0903eaec84'
+            'x-instagram-gis': '733e511a075383d097d5adf0bd33850e'
         }
         self.assertEqual(expected_headers, headers)
 

@@ -71,7 +71,8 @@ class TestFirstPagePaginator(TestPaginatorBase, unittest.TestCase):
         self.shared_data_as_dict = json.loads(self.shared_data)
 
     def test_get_headers(self):
-        headers = self.paginator.get_headers(self.shared_data_as_dict)
+        rhx_gis = '1ccc3091227dd50beb2f959a13935d0c'
+        headers = self.paginator.get_headers(self.shared_data_as_dict, rhx_gis)
         expected_headers = {
             'x-requested-with': 'XMLHttpRequest',
             'x-instagram-gis': '44da33c4e4f2e441da0b845bb0128161'
