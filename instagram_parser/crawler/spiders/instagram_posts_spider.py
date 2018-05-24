@@ -5,6 +5,10 @@
 import scrapy
 from scrapy import Request
 
+from instagram_parser.crawler.spiders.publications_by_tag_spider import (
+    IndexPageParser,
+    NextPageParser
+)
 from instagram_parser.crawler.paginators.publications_by_location_paginators import (
     PublicationsByLocationPaginatorInFirstPage,
     PublicationsByLocationPaginatorInNextPage
@@ -19,6 +23,56 @@ from instagram_parser.crawler.data_extractors.post_detail_page_data_extractor \
 
 QUERY_LOCATION_VARS = '{{"id":"{0}","first":12,"after":"{1}"}}'
 
+#
+# class PublicationsByTagSpider(scrapy.Spider):
+#     name = 'publications_by_location_spider'
+#     base_url = 'https://www.instagram.com'
+#
+#     def __init__(self, location_id, spider_stopper, posts_filter,
+#                  result, *args, **kwargs):
+#         """
+#         :param spider_stopper: Остановщик парсера
+#         :param posts_filter: Фильтровщик постов (например по дате публикации)
+#         :param result: Результат работы парсера сохраняем в аргумент, переданный при запуске
+#         """
+#         self.location_id = location_id
+#         self.start_urls = ['{}/explore/locations/{}/'.format(self.base_url, self.location_id)]
+#         self.posts_info = result
+#         self.spider_stoper = spider_stopper
+#         self.post_filter = posts_filter
+#
+#         super(PublicationsByTagSpider, self).__init__(*args, **kwargs)
+#
+#     def parse(self, response):
+#         page_parser = IndexPageParser(tag=self.tag,
+#                                  spider_stopper=self.spider_stoper,
+#                                  posts_filter=self.post_filter,
+#                                  result=self.posts_info,
+#                                  detail_page_parser=self.parse_post_detail_page,
+#                                  next_page_parser=self.parse_next_page,
+#                                  base_url=self.base_url)
+#         return page_parser.parse(response)
+#
+#     def parse_next_page(self, response):
+#         page_parser = NextPageParser(tag=self.tag,
+#                                  spider_stopper=self.spider_stoper,
+#                                  posts_filter=self.post_filter,
+#                                  result=self.posts_info,
+#                                  detail_page_parser=self.parse_post_detail_page,
+#                                  next_page_parser=self.parse_next_page,
+#                                  base_url=self.base_url)
+#         return page_parser.parse(response)
+#
+#     def parse_post_detail_page(self, response):
+#         """
+#         Парсинг информации со страницы с детальной информацией о посте
+#         """
+#         parser = PostDetailPageDataExtractor()
+#         page_data = parser.get_page_data_as_dict(response)
+#         post_data = parser.collect_data_from_post(page_data)
+#         (post_id, post_info), = post_data.items()
+#         self.posts_info[post_id].update(post_info)
+#
 
 class InstagramPostsSpider(scrapy.Spider):
     name = 'instagram_posts_spider'

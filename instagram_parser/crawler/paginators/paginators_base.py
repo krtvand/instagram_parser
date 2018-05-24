@@ -95,3 +95,4 @@ class PaginatorInNextPage(Paginator):
         if not query_hash:
             raise PaginationException('Can not get query_hash from response.request.meta. '
                                       'It should be set in the first page paginator')
+        return query_hash
