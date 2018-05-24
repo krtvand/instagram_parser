@@ -5,10 +5,16 @@
 import scrapy
 from scrapy import Request
 
-from instagram_parser.crawler.utils.pagination import (PublicationsByTagPaginatorInFirstPage, PublicationsByTagPaginatorInNextPage)
-from instagram_parser.crawler.data_extractors.publications_by_tags_extractors.next_page_data_extractor import PublicationsByTagNextPageDataExtractor
-from instagram_parser.crawler.data_extractors.publications_by_tags_extractors.index_page_data_extractor import IndexPageDataExtractor
-from instagram_parser.crawler.data_extractors.post_detail_page_data_extractor import PostDetailPageDataExtractor
+from instagram_parser.crawler.paginators.publications_by_tag_paginators import (
+    PublicationsByTagPaginatorInFirstPage,
+    PublicationsByTagPaginatorInNextPage
+)
+from instagram_parser.crawler.data_extractors.publications_by_tags_extractors.next_page_data_extractor \
+    import PublicationsByTagNextPageDataExtractor
+from instagram_parser.crawler.data_extractors.publications_by_tags_extractors.index_page_data_extractor \
+    import IndexPageDataExtractor
+from instagram_parser.crawler.data_extractors.post_detail_page_data_extractor import \
+    PostDetailPageDataExtractor
 
 
 class SpiderException(Exception):

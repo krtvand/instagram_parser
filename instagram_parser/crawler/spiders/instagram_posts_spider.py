@@ -5,10 +5,16 @@
 import scrapy
 from scrapy import Request
 
-from instagram_parser.crawler.utils.pagination import (PaginatorInFirstPage, PaginatorInNextPage)
-from instagram_parser.crawler.data_extractors.publications_by_location.next_page_data_extractor import PublicationsByLocationNextPageDataExtractor
-from instagram_parser.crawler.data_extractors.publications_by_location.first_page_data_extractor import FirstPageDataExtractor
-from instagram_parser.crawler.data_extractors.post_detail_page_data_extractor import PostDetailPageDataExtractor
+from instagram_parser.crawler.paginators.publications_by_location_paginators import (
+    PaginatorInFirstPage,
+    PaginatorInNextPage
+)
+from instagram_parser.crawler.data_extractors.publications_by_location.next_page_data_extractor \
+    import PublicationsByLocationNextPageDataExtractor
+from instagram_parser.crawler.data_extractors.publications_by_location.first_page_data_extractor \
+    import FirstPageDataExtractor
+from instagram_parser.crawler.data_extractors.post_detail_page_data_extractor \
+    import PostDetailPageDataExtractor
 
 
 QUERY_LOCATION_VARS = '{{"id":"{0}","first":12,"after":"{1}"}}'

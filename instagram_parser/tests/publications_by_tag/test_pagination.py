@@ -8,12 +8,14 @@ import requests_mock
 
 from instagram_parser.tests.utils import (fake_scrapy_response_from_file,
                                                     load_text_from_file)
-from instagram_parser.crawler.utils.pagination import (PublicationsByTagPaginatorInFirstPage,
-                                                       PublicationsByTagPaginatorInNextPage)
+from instagram_parser.crawler.paginators.publications_by_tag_paginators import (
+    PublicationsByTagPaginatorInFirstPage,
+    PublicationsByTagPaginatorInNextPage
+)
 
 
 class TestPublicationsByTagPaginatorInFirstPage(unittest.TestCase):
-    tag = 'yandex'
+    tag = 'bostondynamics'
     base_url = 'https://www.instagram.com'
 
     def setUp(self):
@@ -36,13 +38,13 @@ class TestPublicationsByTagPaginatorInFirstPage(unittest.TestCase):
         m.get('https://www.instagram.com/static/bundles/base/TagPageContainer.js/903e7d59db3f.js',
               text=self.source_of_js_with_queryhash.decode('utf-8'))
         EXPECTED_QUERYHASH = u'ded47faa9a1aaded10161a2ff32abb6b'
-        query_hash = self.paginator.get_query_hash(self.response)
+        query_hash = self.paginator._get_query_hash(self.response)
         self.assertEqual(EXPECTED_QUERYHASH, query_hash)
 
     def test_get_url_for_next_page(self):
-        self.paginator.get_query_hash = MagicMock(return_value='ded47faa9a1aaded10161a2ff32abb6b')
+        self.paginator._get_query_hash = MagicMock(return_value='ded47faa9a1aaded10161a2ff32abb6b')
         self.paginator.get_last_post_id = MagicMock(return_value = self.last_post_id)
-        expected_url = 'https://www.instagram.com/graphql/query/?query_hash=ded47faa9a1aaded10161a2ff32abb6b&variables=%7B%22tag_name%22%3A%22yandex%22%2C%22first%22%3A12%2C%22after%22%3A%221718895412364831673%22%7D'
+        expected_url = 'https://www.instagram.com/graphql/query/?query_hash=ded47faa9a1aaded10161a2ff32abb6b&variables=%7B%22tag_name%22%3A%22bostondynamics%22%2C%22first%22%3A12%2C%22after%22%3A%221718895412364831673%22%7D'
         url = self.paginator.get_url_for_next_page(self.response, self.shared_data_as_dict)
         self.assertEqual(expected_url, url)
 
@@ -61,7 +63,7 @@ class TestPublicationsByTagPaginatorInFirstPage(unittest.TestCase):
         headers = self.paginator.get_headers(self.shared_data_as_dict, rhx_gis)
         expected_headers = {
             'x-requested-with': 'XMLHttpRequest',
-            'x-instagram-gis': 'a8800a3aea75e4e038a42003c3217b48'
+            'x-instagram-gis': 'cab019530bc10fdf4dc15270435e98f5'
         }
         self.assertEqual(expected_headers, headers)
 
@@ -77,7 +79,7 @@ class TestPublicationsByTagPaginatorInFirstPage(unittest.TestCase):
 
 
 class TestNextPagePaginator(unittest.TestCase):
-    tag = 'yandex'
+    tag = 'bostondynamics'
     base_url = 'https://www.instagram.com'
 
     def setUp(self):
@@ -91,7 +93,7 @@ class TestNextPagePaginator(unittest.TestCase):
         headers = self.paginator.get_headers(self.shared_data_as_dict, rhx_gis)
         expected_headers = {
             'x-requested-with': 'XMLHttpRequest',
-            'x-instagram-gis': '164f312ae6598f1eb0fcb0b5999924d4'
+            'x-instagram-gis': '472c0cc7ec30913268a6b40216d8f494'
         }
         self.assertEqual(expected_headers, headers)
 
