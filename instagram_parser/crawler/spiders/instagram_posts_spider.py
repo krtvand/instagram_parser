@@ -6,8 +6,8 @@ import scrapy
 from scrapy import Request
 
 from instagram_parser.crawler.paginators.publications_by_location_paginators import (
-    PaginatorInFirstPage,
-    PaginatorInNextPage
+    PublicationsByLocationPaginatorInFirstPage,
+    PublicationsByLocationPaginatorInNextPage
 )
 from instagram_parser.crawler.data_extractors.publications_by_location.next_page_data_extractor \
     import PublicationsByLocationNextPageDataExtractor
@@ -44,8 +44,8 @@ class InstagramPostsSpider(scrapy.Spider):
 
     def set_paginator(self, paginator_type):
         paginators = {
-            'index_page_paginator': PaginatorInFirstPage(self.base_url, self.location_id),
-            'next_page_paginator': PaginatorInNextPage(self.base_url, self.location_id)
+            'index_page_paginator': PublicationsByLocationPaginatorInFirstPage(self.base_url, self.location_id),
+            'next_page_paginator': PublicationsByLocationPaginatorInNextPage(self.base_url, self.location_id)
         }
         self.paginator = paginators[paginator_type]
 
@@ -77,8 +77,8 @@ class InstagramPostsSpider(scrapy.Spider):
 
         if self.paginator.pagination_has_next_page(shared_data):
             next_page_url = self.paginator.get_url_for_next_page(response, shared_data)
-            headers = self.paginator.get_headers(shared_data)
             self.rhx_gis = shared_data['rhx_gis']
+            headers = self.paginator.get_headers(shared_data, self.rhx_gis)
             meta = response.request.meta
             yield Request(next_page_url, headers=headers, meta=meta, callback=self.parse_next_page)
         else:
