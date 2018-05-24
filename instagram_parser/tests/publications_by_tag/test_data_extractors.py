@@ -68,7 +68,7 @@ class TestPublicationByTagNextPageDataExtractor(unittest.TestCase):
         self.assertTrue('data' in next_page_data_dict)
 
     def test_get_post_objects(self):
-        POSTS_NUMBER_FROM_NEXT_PAGE = 27
+        POSTS_NUMBER_FROM_NEXT_PAGE = 25
         post_objects = self.data_extractor.get_post_objects(self.next_page_data_dict)
         self.assertEqual(len(post_objects), POSTS_NUMBER_FROM_NEXT_PAGE)
         self.assertDictEqual(self.new_posts_list[0], post_objects[0])

@@ -91,12 +91,12 @@ class TestNextPagePaginator(unittest.TestCase):
         headers = self.paginator.get_headers(self.shared_data_as_dict, rhx_gis)
         expected_headers = {
             'x-requested-with': 'XMLHttpRequest',
-            'x-instagram-gis': '733e511a075383d097d5adf0bd33850e'
+            'x-instagram-gis': '164f312ae6598f1eb0fcb0b5999924d4'
         }
         self.assertEqual(expected_headers, headers)
 
     def test_get_last_post_id(self):
-        EXPECTED_ID = 'AQBzvMSLkbReOANL5TbywbMa3yhl5fWSXU4QFO4tEFPWnNhHkRt7Ojo0STFqAqBuTZiSzETCF0Wjazq_jqjNpu4dYdr_7dGsEbplAtCyP75ztg'
+        EXPECTED_ID = 'AQCHa2TvKcDEaI5vyQ_ihlF2NdG7sYdJTFKzFOmhUlSxVt6d_HTsCc9QqvFyjxKGryklmxkZkaQx_EcxO9mgbhQbDXD5TS5f9p5nT4e9Bph7lg'
         last_post_id = self.paginator.get_last_post_id(self.shared_data_as_dict)
         self.assertEqual(EXPECTED_ID, last_post_id)
 
