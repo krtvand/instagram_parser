@@ -19,9 +19,9 @@ from instagram_parser.tests.utils import (
 class TestIndexPageParser(unittest.TestCase):
 
     def setUp(self):
-        PAGE_SOURCE = 'source_data/instagram_publications_by_location.html'
-        SHARED_DATA_FILE = 'source_data/shared_data.txt'
-        POSTS_FILE = 'source_data/posts_from_index_page.json'
+        PAGE_SOURCE = 'publications_by_location/source_data/instagram_publications_by_location.html'
+        SHARED_DATA_FILE = 'publications_by_location/source_data/shared_data.txt'
+        POSTS_FILE = 'publications_by_location/source_data/posts_from_index_page.json'
         self.response = fake_scrapy_response_from_file(file_name=PAGE_SOURCE)
         self.shared_data = load_text_from_file(SHARED_DATA_FILE)
         self.shared_data_as_dict = json.loads(self.shared_data)
@@ -59,8 +59,8 @@ class TestIndexPageParser(unittest.TestCase):
 class TestNextPageParser(unittest.TestCase):
 
     def setUp(self):
-        NEXT_PAGE_SOURCE = 'source_data/instagram_publications_by_location_next_page.json'
-        NEXT_PAGE_POSTS = 'source_data/posts_from_next_page.json'
+        NEXT_PAGE_SOURCE = 'publications_by_location/source_data/instagram_publications_by_location_next_page.json'
+        NEXT_PAGE_POSTS = 'publications_by_location/source_data/posts_from_next_page.json'
         self.response = fake_scrapy_response_from_file(file_name=NEXT_PAGE_SOURCE)
         self.next_page_data_str = load_text_from_file(NEXT_PAGE_SOURCE)
         self.next_page_data_as_dict = json.loads(self.next_page_data_str)

@@ -16,9 +16,9 @@ from instagram_parser.tests.utils import (
 
 class TestPublicationsByTagsFirstPageDataExtracor(unittest.TestCase):
     def setUp(self):
-        page_source = 'source_data/publications_by_tags/index_page_source.html'
-        shared_data_from_index_page_json = 'source_data/publications_by_tags/shared_data_from_index_page.json'
-        new_posts_from_index_page_json = 'source_data/publications_by_tags/new_posts_from_index_page.json'
+        page_source = 'publications_by_tag/source_data/index_page_source.html'
+        shared_data_from_index_page_json = 'publications_by_tag/source_data/shared_data_from_index_page.json'
+        new_posts_from_index_page_json = 'publications_by_tag/source_data/new_posts_from_index_page.json'
         self.response = fake_scrapy_response_from_file(file_name=page_source)
         self.shared_data_str = load_text_from_file(shared_data_from_index_page_json)
         self.shared_data_dict = json.loads(self.shared_data_str)
@@ -53,8 +53,8 @@ class TestPublicationsByTagsFirstPageDataExtracor(unittest.TestCase):
 class TestPublicationByTagNextPageDataExtractor(unittest.TestCase):
 
     def setUp(self):
-        page_source = 'source_data/publications_by_tags/next_page_data.json'
-        next_page_posts_json_file = 'source_data/publications_by_tags/posts_from_next_page.json'
+        page_source = 'publications_by_tag/source_data/next_page_data.json'
+        next_page_posts_json_file = 'publications_by_tag/source_data/posts_from_next_page.json'
         self.response = fake_scrapy_response_from_file(file_name=page_source)
         self.next_page_data_str = load_text_from_file(page_source)
         self.next_page_data_dict = json.loads(self.next_page_data_str)
@@ -68,7 +68,7 @@ class TestPublicationByTagNextPageDataExtractor(unittest.TestCase):
         self.assertTrue('data' in next_page_data_dict)
 
     def test_get_post_objects(self):
-        POSTS_NUMBER_FROM_NEXT_PAGE = 25
+        POSTS_NUMBER_FROM_NEXT_PAGE = 27
         post_objects = self.data_extractor.get_post_objects(self.next_page_data_dict)
         self.assertEqual(len(post_objects), POSTS_NUMBER_FROM_NEXT_PAGE)
         self.assertDictEqual(self.new_posts_list[0], post_objects[0])

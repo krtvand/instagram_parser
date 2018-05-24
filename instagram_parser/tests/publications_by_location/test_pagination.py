@@ -16,15 +16,15 @@ from instagram_parser.crawler.utils.pagination import (PaginatorInFirstPage,
 class TestPaginatorBase:
     LOCATION_ID = '213526478'
     base_url = 'https://www.instagram.com'
-    SHARED_DATA_FILE = 'source_data/shared_data.txt'
+    SHARED_DATA_FILE = 'publications_by_location/source_data/shared_data.txt'
 
 
 class TestPaginator(TestPaginatorBase, unittest.TestCase):
 
     def setUp(self):
 
-        PAGE_SOURCE = 'source_data/instagram_publications_by_location.html'
-        JS_FILE_WITH_QUERYHASH = 'source_data/LocationPageContainer.js'
+        PAGE_SOURCE = 'publications_by_location/source_data/instagram_publications_by_location.html'
+        JS_FILE_WITH_QUERYHASH = 'publications_by_location/source_data/LocationPageContainer.js'
         self.shared_data = load_text_from_file(self.SHARED_DATA_FILE)
         self.shared_data_as_dict = json.loads(self.shared_data)
         self.response = fake_scrapy_response_from_file(file_name=PAGE_SOURCE)
@@ -92,7 +92,7 @@ class TestFirstPagePaginator(TestPaginatorBase, unittest.TestCase):
 
 class TestNextPagePaginator(TestPaginatorBase, unittest.TestCase):
 
-    NEXT_PAGE_SOURCE = 'source_data/instagram_publications_by_location_next_page.json'
+    NEXT_PAGE_SOURCE = 'publications_by_location/source_data/instagram_publications_by_location_next_page.json'
 
     def setUp(self):
         self.paginator = PaginatorInNextPage(self.base_url, self.LOCATION_ID)

@@ -39,7 +39,7 @@ if __name__ == '__main__':
     date_till = datetime.datetime.utcnow() - datetime.timedelta(minutes=10)
     tag = 'yandex'
 
-    result = parse_publications_by_tag(tag=tag, date_from=date_from, date_till=date_till, max_items=110)
+    result = parse_publications_by_tag(tag=tag, date_from=date_from, date_till=date_till, max_items=80)
     # result = parse_instagram(location_id=location_id, date_from=date_from, date_till=date_till)
     print(json.dumps(result))
     print(len(result))

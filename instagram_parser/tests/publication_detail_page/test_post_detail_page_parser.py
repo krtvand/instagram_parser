@@ -11,7 +11,7 @@ from instagram_parser.crawler.data_extractors.post_detail_page_data_extractor im
 class TestIndexPageParser(unittest.TestCase):
 
     def setUp(self):
-        PAGE_SOURCE_FILE_NAME = 'source_data/post_detail_source.json'
+        PAGE_SOURCE_FILE_NAME = 'publication_detail_page/source_data/post_detail_source.json'
         self.response = fake_scrapy_response_from_file(file_name=PAGE_SOURCE_FILE_NAME)
         self.page_data_as_dict = json.loads(load_text_from_file(PAGE_SOURCE_FILE_NAME))
         self.parser = PostDetailPageDataExtractor()
