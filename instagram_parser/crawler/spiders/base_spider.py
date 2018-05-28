@@ -2,6 +2,7 @@
 
 from scrapy import Request
 
+from instagram_parser.crawler.data_extractors.post_detail_page_data_extractor import PostDetailPageDataExtractor
 
 class SpiderException(Exception):
     """
@@ -99,3 +100,17 @@ class NextPageParser(PageParser):
         return rhx_gis
 
 
+class PostDetailPageParser(PageParser):
+
+    def __init__(self, result):
+        self.posts_info = result
+
+    def parse(self, response):
+        """
+        Парсинг информации со страницы с детальной информацией о посте
+        """
+        page_data_extractor = PostDetailPageDataExtractor()
+        page_data = page_data_extractor.get_page_data_as_dict(response)
+        post_data = page_data_extractor.collect_data_from_post(page_data)
+        (post_id, post_info), = post_data.items()
+        self.posts_info[post_id].update(post_info)

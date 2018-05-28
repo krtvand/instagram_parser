@@ -5,7 +5,11 @@
 import scrapy
 
 
-from instagram_parser.crawler.spiders.base_spider import IndexPageParser, NextPageParser
+from instagram_parser.crawler.spiders.base_spider import (
+    IndexPageParser,
+    NextPageParser,
+    PostDetailPageParser
+)
 from instagram_parser.crawler.paginators.publications_by_tag_paginators import (
     PublicationsByTagPaginatorInFirstPage,
     PublicationsByTagPaginatorInNextPage
@@ -61,11 +65,8 @@ class PublicationsByTagSpider(scrapy.Spider):
         """
         Парсинг информации со страницы с детальной информацией о посте
         """
-        parser = PostDetailPageDataExtractor()
-        page_data = parser.get_page_data_as_dict(response)
-        post_data = parser.collect_data_from_post(page_data)
-        (post_id, post_info), = post_data.items()
-        self.posts_info[post_id].update(post_info)
+        page_parser = PostDetailPageParser(result=self.posts_info)
+        return page_parser.parse(response)
 
 
 class PublicationsByTagIndexPageParser(IndexPageParser):
