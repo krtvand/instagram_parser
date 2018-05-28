@@ -4,7 +4,7 @@ import json
 import datetime
 
 from scrapy.crawler import CrawlerProcess
-from instagram_parser.crawler.spiders.instagram_posts_spider import InstagramPostsSpider
+from instagram_parser.crawler.spiders.publications_by_location_spider import PublicationsByLocationSpider
 from instagram_parser.crawler.utils.posts_filter import (PublicationDatePostFilter,
                                                          DummyPostFilter)
 from instagram_parser.crawler.utils.spider_stopper import (PostPublicationDateStopper,
@@ -28,7 +28,7 @@ def parse_instagram(location_id, date_from, date_till, max_items=None):
 
 
     result = {}
-    process.crawl(InstagramPostsSpider, spider_stopper=spider_stopper, posts_filter=posts_filter,
+    process.crawl(PublicationsByLocationSpider, spider_stopper=spider_stopper, posts_filter=posts_filter,
                   result=result, location_id=location_id)
     process.start()
 
