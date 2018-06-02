@@ -17,9 +17,10 @@ class TestIndexPageParser(unittest.TestCase):
         self.parser = PostDetailPageDataExtractor()
 
     def test_collect_data_from_post(self):
-        expected_post_id = '1724081323683765859'
+        expected_post_id = u'1724081323683765859'
         expected_post_data = {
-            'owner_username': 'etsu_real',
+            'edge_media_to_caption': u"\u041f\u0440\u043e\u0441\u0442\u043e \u0444\u043e\u0442\u043e \u0441 \u0418\u041d\u041a.\n\u041d\u0438\u043a\u0430\u043a\u043e\u0439 \u0441\u043c\u044b\u0441\u043b\u043e\u0432\u043e\u0439 \u043d\u0430\u0433\u0440\u0443\u0437\u043a\u0438",
+            'owner_username': u'etsu_real',
         }
         expected = {expected_post_id: expected_post_data}
 

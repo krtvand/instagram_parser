@@ -93,6 +93,9 @@ class PostDataExtractor(object):
         publication_date = self.get_publication_date(post)
         if publication_date:
             post_data.update({'publication_date': publication_date})
+        edge_media_to_caption = self.get_edge_media_to_caption(post)
+        if edge_media_to_caption:
+            post_data.update({'edge_media_to_caption': edge_media_to_caption})
 
         result = {post_id: post_data}
 
@@ -127,6 +130,11 @@ class PostDataExtractor(object):
     def get_publication_date(self, post):
         """
         Дата публикации поста
+        """
+
+    def get_edge_media_to_caption(self, post):
+        """
+        Подпись к публикации (заголовок)
         """
 
 class PublicationsByLocationPostDataExtractor(PostDataExtractor):
@@ -168,3 +176,15 @@ class PostDetailPagePostDataExtractor(PostDataExtractor):
         if not post_id:
             raise DataExtractorException('Can not get post id from post detail page')
         return post_id
+
+    def get_edge_media_to_caption(self, post):
+        text = None
+        try:
+            edges = post.get('graphql', {}).get('shortcode_media', {})\
+                .get('edge_media_to_caption', {}).get('edges', [{}])
+            if edges:
+                text = edges[0].get('node', {}).get('text')
+        except Exception as e:
+            raise DataExtractorException('Can not get edge_media_to_caption '
+                                         'from post detail page. {}'.format(e))
+        return text
