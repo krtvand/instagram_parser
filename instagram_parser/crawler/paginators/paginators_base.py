@@ -75,7 +75,7 @@ class PaginatorInFirstPage(Paginator):
             js_with_query_hash = requests.get(urljoin(self.base_url, js_relative_url))
             query_hash = self.get_queryhash_from_js_source(js_with_query_hash.text)
         except PaginationException:
-            logging.ERROR('Can not parse query_hash from js source, using default value')
+            logging.error('Can not parse query_hash from js source, using default value')
             query_hash = self.get_default_query_hash()
 
         return query_hash
