@@ -5,6 +5,7 @@ from instagram_parser.crawler.paginators.paginators_base import (
     PaginatorInFirstPage,
     PaginationException
 )
+from instagram_parser.crawler.constants import *
 
 
 class PublicationsByLocationPaginatorInFirstPage(PaginatorInFirstPage):
@@ -42,6 +43,9 @@ class PublicationsByLocationPaginatorInFirstPage(PaginatorInFirstPage):
             '//link[contains(@href, "/static/bundles/base/LocationPageContainer.js")]/@href').extract_first()
 
         return link
+
+    def get_default_query_hash(self):
+        return QUERYHASH_FOR_PUBLICATIONS_BY_LOCATION
 
 
 class PublicationsByLocationPaginatorInNextPage(PaginatorInNextPage):

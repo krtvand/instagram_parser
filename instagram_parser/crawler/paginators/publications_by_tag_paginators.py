@@ -4,6 +4,7 @@ from instagram_parser.crawler.paginators.paginators_base import (PaginatorInFirs
                                                                  PaginatorInNextPage,
                                                                  PaginationException)
 from instagram_parser.crawler.utils.headers_manager import PaginationHeadersManager
+from instagram_parser.crawler.constants import *
 
 
 class PublicationsByTagPaginatorInFirstPage(PaginatorInFirstPage):
@@ -53,6 +54,9 @@ class PublicationsByTagPaginatorInFirstPage(PaginatorInFirstPage):
         else:
             raise PaginationException('Can not extract query_hash from js_source')
         return query_hash
+
+    def get_default_query_hash(self):
+        return QUERYHASH_FOR_PUBLICATIONS_BY_TAG
 
 
 class PublicationsByTagPaginatorInNextPage(PaginatorInNextPage):

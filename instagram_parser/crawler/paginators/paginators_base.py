@@ -4,6 +4,7 @@ import re
 import json
 from urllib import urlencode
 from urlparse import urljoin
+import logging
 
 import requests
 
@@ -69,9 +70,13 @@ class PaginatorInFirstPage(Paginator):
         :param response: индексная страница для постов в заданной локации
         :return:
         """
-        js_relative_url = self.get_link_for_js_file_with_queryhash(response)
-        js_with_query_hash = requests.get(urljoin(self.base_url, js_relative_url))
-        query_hash = self.get_queryhash_from_js_source(js_with_query_hash.text)
+        try:
+            js_relative_url = self.get_link_for_js_file_with_queryhash(response)
+            js_with_query_hash = requests.get(urljoin(self.base_url, js_relative_url))
+            query_hash = self.get_queryhash_from_js_source(js_with_query_hash.text)
+        except PaginationException:
+            logging.ERROR('Can not parse query_hash from js source, using default value')
+            query_hash = self.get_default_query_hash()
 
         return query_hash
 
@@ -86,6 +91,9 @@ class PaginatorInFirstPage(Paginator):
         else:
             raise PaginationException('Can not extract query_hash from js_source')
         return query_hash
+
+    def get_default_query_hash(self):
+        raise NotImplementedError
 
 
 class PaginatorInNextPage(Paginator):
