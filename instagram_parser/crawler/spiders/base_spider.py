@@ -12,23 +12,19 @@ class SpiderException(Exception):
 
 class PageParser(object):
 
-    def __init__(self, spider_stopper, posts_filter,
-                 result, detail_page_parser, next_page_parser, base_url, *args, **kwargs):
+    def __init__(self, objects_parser,
+                 result, next_page_parser, *args, **kwargs):
         """
         :param spider_stopper: Остановщик парсера
         :param posts_filter: Фильтровщик постов (например по дате публикации)
         :param result: Результат работы парсера сохраняем в аргумент, переданный при запуске
         """
-        self.detail_page_parser = detail_page_parser
         self.next_page_parser = next_page_parser
-        self.base_url = base_url
         self.posts_info = result
-        self.spider_stoper = spider_stopper
-        self.post_filter = posts_filter
         self.paginator = self.get_paginator()
-        self.page_data_extractor = self.get_page_data_extractor()
         self.shared_data = None
         self.response = None
+        self.objects_parser = objects_parser
 
     def get_paginator(self):
         raise NotImplementedError
@@ -37,25 +33,7 @@ class PageParser(object):
         raise NotImplementedError
 
     def parse(self, response):
-        self.response = response
-        self.shared_data = self.page_data_extractor.get_page_info_from_json(response)
-        posts_list = self.page_data_extractor.get_post_objects(self.shared_data)
-
-        for post in posts_list:
-            post_data = self.page_data_extractor.collect_data_from_post(post)
-            (post_id, post_info), = post_data.items()
-            if self.spider_stoper.should_we_stop_spider(
-                    publication_date_in_epoch=post_info['publication_date'],
-                    items=self.posts_info):
-                return
-            if self.post_filter.must_be_discarded(post_data):
-                continue
-            self.posts_info.update(post_data)
-            headers = {'x-requested-with': 'XMLHttpRequest'}
-            yield Request(url='{}/p/{}/?__a=1'.format(self.base_url, post_info['shortcode']),
-                          headers=headers, callback=self.detail_page_parser,
-                          meta=response.request.meta)
-
+        self.objects_parser.parse_objects()
         yield self.go_to_next_page(response, self.shared_data, self.next_page_parser)
 
     def go_to_next_page(self, response, shared_data, next_page_parser):
@@ -74,6 +52,42 @@ class PageParser(object):
 
     def get_rhx_gis(self):
         raise NotImplementedError
+
+class PostsObjectsParser:
+    def __init__(self, spider_stopper, posts_filter, page_data_extractor,
+                 result, detail_page_parser):
+        """
+        :param spider_stopper: Остановщик парсера
+        :param posts_filter: Фильтровщик постов (например по дате публикации)
+        :param result: Результат работы парсера сохраняем в аргумент, переданный при запуске
+        """
+        self.detail_page_parser = detail_page_parser
+        self.posts_info = result
+        self.spider_stoper = spider_stopper
+        self.post_filter = posts_filter
+        self.page_data_extractor = page_data_extractor
+        self.shared_data = None
+        self.response = None
+
+    def parse_objects(self, response):
+        self.response = response
+        self.shared_data = self.page_data_extractor.get_page_info_from_json(response)
+        posts_list = self.page_data_extractor.get_post_objects(self.shared_data)
+
+        for post in posts_list:
+            post_data = self.page_data_extractor.collect_data_from_post(post)
+            (post_id, post_info), = post_data.items()
+            if self.spider_stoper.should_we_stop_spider(
+                    publication_date_in_epoch=post_info['publication_date'],
+                    items=self.posts_info):
+                return
+            if self.post_filter.must_be_discarded(post_data):
+                continue
+            self.posts_info.update(post_data)
+            headers = {'x-requested-with': 'XMLHttpRequest'}
+            yield Request(url='{}/p/{}/?__a=1'.format(self.base_url, post_info['shortcode']),
+                          headers=headers, callback=self.detail_page_parser,
+                          meta=response.request.meta)
 
 
 class IndexPageParser(PageParser):
