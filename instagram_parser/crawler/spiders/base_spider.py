@@ -12,7 +12,7 @@ class SpiderException(Exception):
 
 class PageParser(object):
 
-    def __init__(self, objects_parser,
+    def __init__(self, objects_parser, base_url,
                  result, next_page_parser, *args, **kwargs):
         """
         :param spider_stopper: Остановщик парсера
@@ -21,10 +21,12 @@ class PageParser(object):
         """
         self.next_page_parser = next_page_parser
         self.posts_info = result
+        self.base_url = base_url
+        self.objects_parser = objects_parser
         self.paginator = self.get_paginator()
+        self.page_data_extractor = self.get_page_data_extractor()
         self.shared_data = None
         self.response = None
-        self.objects_parser = objects_parser
 
     def get_paginator(self):
         raise NotImplementedError
@@ -33,7 +35,9 @@ class PageParser(object):
         raise NotImplementedError
 
     def parse(self, response):
-        self.objects_parser.parse_objects()
+        self.response = response
+        self.shared_data = self.page_data_extractor.get_page_info_from_json(response)
+        self.objects_parser.parse_objects(response, self.shared_data)
         yield self.go_to_next_page(response, self.shared_data, self.next_page_parser)
 
     def go_to_next_page(self, response, shared_data, next_page_parser):
@@ -53,9 +57,10 @@ class PageParser(object):
     def get_rhx_gis(self):
         raise NotImplementedError
 
+
 class PostsObjectsParser:
     def __init__(self, spider_stopper, posts_filter, page_data_extractor,
-                 result, detail_page_parser):
+                 result, detail_page_parser, base_url):
         """
         :param spider_stopper: Остановщик парсера
         :param posts_filter: Фильтровщик постов (например по дате публикации)
@@ -66,12 +71,13 @@ class PostsObjectsParser:
         self.spider_stoper = spider_stopper
         self.post_filter = posts_filter
         self.page_data_extractor = page_data_extractor
+        self.base_url = base_url
         self.shared_data = None
         self.response = None
 
-    def parse_objects(self, response):
+    def parse_objects(self, response, shared_data):
         self.response = response
-        self.shared_data = self.page_data_extractor.get_page_info_from_json(response)
+        self.shared_data = shared_data
         posts_list = self.page_data_extractor.get_post_objects(self.shared_data)
 
         for post in posts_list:

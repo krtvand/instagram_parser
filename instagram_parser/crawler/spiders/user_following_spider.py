@@ -37,7 +37,7 @@ class UserFollowingSpider(scrapy.Spider):
         super(UserFollowingSpider, self).__init__(*args, **kwargs)
 
     def parse(self, response):
-        page_parser = PublicationsByTagIndexPageParser(tag=self.user_name,
+        page_parser = UserFollowingIndexPageParser(tag=self.user_name,
                                                        spider_stopper=self.spider_stoper,
                                                        posts_filter=self.post_filter,
                                                        result=self.posts_info,
@@ -47,7 +47,7 @@ class UserFollowingSpider(scrapy.Spider):
         return page_parser.parse(response)
 
     def parse_next_page(self, response):
-        page_parser = PublicationsByTagNextPageParser(tag=self.user_name,
+        page_parser = UserFollowingNextPageParser(tag=self.user_name,
                                                       spider_stopper=self.spider_stoper,
                                                       posts_filter=self.post_filter,
                                                       result=self.posts_info,
@@ -59,11 +59,11 @@ class UserFollowingSpider(scrapy.Spider):
 
 
 
-class PublicationsByTagIndexPageParser(IndexPageParser):
+class UserFollowingIndexPageParser(IndexPageParser):
 
     def __init__(self, tag, *args, **kwargs):
         self.tag = tag
-        super(PublicationsByTagIndexPageParser, self).__init__(*args, **kwargs)
+        super(UserFollowingIndexPageParser, self).__init__(*args, **kwargs)
 
     def get_paginator(self):
         return PublicationsByTagPaginatorInFirstPage(self.base_url, self.tag)
@@ -72,11 +72,11 @@ class PublicationsByTagIndexPageParser(IndexPageParser):
         return IndexPageDataExtractor()
 
 
-class PublicationsByTagNextPageParser(NextPageParser):
+class UserFollowingNextPageParser(NextPageParser):
 
     def __init__(self, tag, *args, **kwargs):
         self.tag = tag
-        super(PublicationsByTagNextPageParser, self).__init__(*args, **kwargs)
+        super(UserFollowingNextPageParser, self).__init__(*args, **kwargs)
 
     def get_paginator(self):
         return PublicationsByTagPaginatorInNextPage(self.base_url, self.tag)

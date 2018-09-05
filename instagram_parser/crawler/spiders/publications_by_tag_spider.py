@@ -8,7 +8,8 @@ import scrapy
 from instagram_parser.crawler.spiders.base_spider import (
     IndexPageParser,
     NextPageParser,
-    PostDetailPageParser
+    PostDetailPageParser,
+    PostsObjectsParser
 )
 from instagram_parser.crawler.paginators.publications_by_tag_paginators import (
     PublicationsByTagPaginatorInFirstPage,
@@ -42,23 +43,39 @@ class PublicationsByTagSpider(scrapy.Spider):
         super(PublicationsByTagSpider, self).__init__(*args, **kwargs)
 
     def parse(self, response):
-        page_parser = PublicationsByTagIndexPageParser(tag=self.tag,
-                                 spider_stopper=self.spider_stoper,
-                                 posts_filter=self.post_filter,
-                                 result=self.posts_info,
-                                 detail_page_parser=self.parse_post_detail_page,
-                                 next_page_parser=self.parse_next_page,
-                                 base_url=self.base_url)
+        objects_parser = PostsObjectsParser(
+            spider_stopper=self.spider_stoper,
+            posts_filter=self.post_filter,
+            result=self.posts_info,
+            detail_page_parser=self.parse_post_detail_page,
+            page_data_extractor=IndexPageDataExtractor(),
+            base_url=self.base_url
+        )
+        page_parser = PublicationsByTagIndexPageParser(
+            tag=self.tag,
+            objects_parser=objects_parser,
+            result=self.posts_info,
+            next_page_parser=self.parse_next_page,
+            base_url=self.base_url
+        )
         return page_parser.parse(response)
 
     def parse_next_page(self, response):
-        page_parser = PublicationsByTagNextPageParser(tag=self.tag,
-                                 spider_stopper=self.spider_stoper,
-                                 posts_filter=self.post_filter,
-                                 result=self.posts_info,
-                                 detail_page_parser=self.parse_post_detail_page,
-                                 next_page_parser=self.parse_next_page,
-                                 base_url=self.base_url)
+        objects_parser = PostsObjectsParser(
+            spider_stopper=self.spider_stoper,
+            posts_filter=self.post_filter,
+            result=self.posts_info,
+            detail_page_parser=self.parse_post_detail_page,
+            page_data_extractor=PublicationsByTagNextPageDataExtractor(),
+            base_url=self.base_url
+        )
+        page_parser = PublicationsByTagNextPageParser(
+            tag=self.tag,
+            objects_parser=objects_parser,
+            result=self.posts_info,
+            next_page_parser=self.parse_next_page,
+            base_url=self.base_url
+        )
         return page_parser.parse(response)
 
     def parse_post_detail_page(self, response):

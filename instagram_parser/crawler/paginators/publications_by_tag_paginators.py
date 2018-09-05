@@ -30,7 +30,7 @@ class PublicationsByTagPaginatorInFirstPage(PaginatorInFirstPage):
                 get('hashtag', {}).get('edge_hashtag_to_media', {}).get('page_info', {}).get('has_next_page')
             if pagination_has_next_page is None:
                 raise Exception
-        except Exception:
+        except Exception as e:
             raise PaginationException(
                 'Can not get value for next_has_page attribute from shared_data')
         return pagination_has_next_page
