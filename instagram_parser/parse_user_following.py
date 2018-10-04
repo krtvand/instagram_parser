@@ -13,6 +13,7 @@ def parse_user_following(username, max_items=None):
         {
             'LOG_LEVEL': 'DEBUG',
             'DOWNLOAD_DELAY': 1,
+            'COOKIES_DEBUG': True,
             'USER_AGENT': 'Firefox 20.0 (Win 8 32)" useragent="Mozilla/5.0 (Windows NT 6.2; rv:20.0) Gecko/20121202 Firefox/20.0'
         }
     )
