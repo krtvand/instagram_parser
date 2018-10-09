@@ -25,6 +25,7 @@ def parse_user_following(login, password, username):
 
 if __name__ == '__main__':
     username = 'kartaev1958'
+    # username = 'mari_mari3058'
 
     login = '89271805343'
     password = 'i8-9271821473'
