@@ -17,15 +17,19 @@ from instagram_parser.crawler.utils.headers_manager import PaginationHeadersMana
 class UserFollowingSpider(scrapy.Spider):
     name = 'user_following_spider'
 
-    def __init__(self, username, spider_stopper, result, *args, **kwargs):
+    def __init__(self, login, password, target_username, result, *args, **kwargs):
         """
+        :param login: логин аккаунта, от имени которого будет выполнена авторизация в instagram
+        :param password: пароль аккаунта, от имени которого будет выполнена авторизация в instagram
+        :param target_username: пользователь instagram, для которого необходимо собрать данные о подписках
         :param spider_stopper: Остановщик парсера
         :param result: Результат работы парсера сохраняем в аргумент, переданный при запуске
         """
-        self.username = username
+        self.login = login
+        self.password = password
+        self.username = target_username
         self.start_urls = [INSTAGRAM_BASE_URL]
         self.result = result
-        self.spider_stoper = spider_stopper
 
         super(UserFollowingSpider, self).__init__(*args, **kwargs)
 
@@ -33,8 +37,7 @@ class UserFollowingSpider(scrapy.Spider):
     def parse(self, response):
         shared_data = UserPageDataExtractor().get_page_info_from_json(response)
         response.request.meta['rhx_gis'] = UserPageDataExtractor().get_rhx_gis(shared_data)
-
-        login_data = {'username': '89271805343', 'password': 'i8-9271821473'}
+        login_data = {'username': self.login, 'password': self.password}
         csrftoken = response.headers.getlist('Set-Cookie')[-1].split(';')[0].split('=')[1]
 
         headers = {
@@ -58,7 +61,7 @@ class UserFollowingSpider(scrapy.Spider):
                        callback=self.parse_user_following, errback=self.error)
 
     def error(self, response):
-        print('error: {}'.format(response))
+        raise Exception('Error in spider')
 
     def parse_user_following(self, response):
         shared_data = ResponseIsSharedDataExtractor().get_page_info_from_json(response)
