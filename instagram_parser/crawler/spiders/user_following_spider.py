@@ -28,13 +28,11 @@ class UserFollowingSpider(scrapy.Spider):
         :param login: логин аккаунта, от имени которого будет выполнена авторизация в instagram
         :param password: пароль аккаунта, от имени которого будет выполнена авторизация в instagram
         :param target_username: пользователь instagram, для которого необходимо собрать данные о подписках
-        :param spider_stopper: Остановщик парсера
         :param result: Результат работы парсера сохраняем в аргумент, переданный при запуске
         """
         self.login = login
         self.password = password
         self.username = target_username
-        # self.start_urls = ['{}{}'.format(INSTAGRAM_BASE_URL, target_username)]
         self.result = result
         self.session_id = ''
 
@@ -68,7 +66,7 @@ class UserFollowingSpider(scrapy.Spider):
 
         if user_logged_in:
             user_id = response.request.meta['user_id']
-            variables = '{{"id":"{user_id}","include_reel":true,"fetch_mutual":false,"first":12}}'.format(user_id=user_id)
+            variables = '{{"id":"{user_id}","include_reel":true,"fetch_mutual":false,"first":48}}'.format(user_id=user_id)
             params = urlencode([('query_hash', 'c56ee0ae1f89cdbd1c89e2bc6b8f3d18'), ('variables', variables)])
             next_page_url = urljoin(INSTAGRAM_BASE_URL, '/graphql/query/') + '?' + params
             headers = PaginationHeadersManager(response.request.meta['rhx_gis'],
@@ -81,10 +79,9 @@ class UserFollowingSpider(scrapy.Spider):
                            meta=response.request.meta, callback=self.after_login,
                            errback=self.error)
 
-
     def after_login(self, response):
         user_id = response.request.meta['user_id']
-        variables = '{{"id":"{user_id}","include_reel":true,"fetch_mutual":false,"first":12}}'.format(user_id=user_id)
+        variables = '{{"id":"{user_id}","include_reel":true,"fetch_mutual":false,"first":48}}'.format(user_id=user_id)
         params = urlencode([('query_hash', 'c56ee0ae1f89cdbd1c89e2bc6b8f3d18'), ('variables', variables)])
         next_page_url = urljoin(INSTAGRAM_BASE_URL, '/graphql/query/') + '?' + params
         headers = PaginationHeadersManager(response.request.meta['rhx_gis'], variables).get_headers()

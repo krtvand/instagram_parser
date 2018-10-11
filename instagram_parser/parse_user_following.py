@@ -12,7 +12,6 @@ def parse_user_following(login, password, username):
         {
             'LOG_LEVEL': 'DEBUG',
             'DOWNLOAD_DELAY': 1,
-            'COOKIES_DEBUG': True,
             'USER_AGENT': 'Firefox 20.0 (Win 8 32)" useragent="Mozilla/5.0 (Windows NT 6.2; rv:20.0) Gecko/20121202 Firefox/20.0'
         }
     )
@@ -24,15 +23,13 @@ def parse_user_following(login, password, username):
 
 
 if __name__ == '__main__':
-    username = 'kartaev1958'
-    # username = 'mari_mari3058'
+    username = 'mordovian_air'
 
-    login = '89271805343'
-    password = 'i8-9271821473'
+    login = ''
+    password = ''
+    if not login:
+        raise Exception('Login empty')
 
     result = parse_user_following(login=login, password=password, username=username)
     print(json.dumps(result))
     print(len(result))
-
-    with open('parsing_results', 'w') as f:
-        f.write(json.dumps(result))
