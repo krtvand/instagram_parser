@@ -2,7 +2,7 @@
 
 from urllib import urlencode
 from urlparse import urljoin
-import pickle
+import os.path
 
 import scrapy
 from scrapy import Request, FormRequest
@@ -34,16 +34,28 @@ class UserFollowingSpider(scrapy.Spider):
         self.login = login
         self.password = password
         self.username = target_username
-        self.start_urls = ['{}{}'.format(INSTAGRAM_BASE_URL, target_username)]
+        # self.start_urls = ['{}{}'.format(INSTAGRAM_BASE_URL, target_username)]
         self.result = result
+        self.session_id = ''
 
         super(UserFollowingSpider, self).__init__(*args, **kwargs)
 
+    def start_requests(self):
+        try:
+            if os.path.exists('session_id.txt'):
+                with open('session_id.txt', 'r') as f:
+                    self.session_id = f.readline()
+        except Exception as e:
+            print('Can not load session_id. Error: {}'.format(e))
+        url = '{}{}'.format(INSTAGRAM_BASE_URL, self.username)
+        return [Request(url, cookies={'sessionid': self.session_id}, callback=self.parse_user_page,
+                        errback=self.error)]
 
-    def parse(self, response):
+    def parse_user_page(self, response):
         shared_data = UserPageDataExtractor().get_page_info_from_json(response)
         response.request.meta['rhx_gis'] = UserPageDataExtractor().get_rhx_gis(shared_data)
         response.request.meta['user_id'] = shared_data.get('entry_data', {}).get('ProfilePage', [{}])[0].get('graphql', {}).get('user', {}).get('id')
+        user_logged_in = shared_data.get('activity_counts')
 
         login_data = {'username': self.login, 'password': self.password}
         csrftoken = response.headers.getlist('Set-Cookie')[-1].split(';')[0].split('=')[1]
@@ -53,28 +65,22 @@ class UserFollowingSpider(scrapy.Spider):
             'user-agent': STORIES_UA,
             'X-CSRFToken': csrftoken
         }
-        session_id = None
-        try:
-            with open('session_id.txt', 'r') as f:
-                session_id = f.readline()
-        except Exception as e:
-            print('Can not load session_id. Error: {}'.format(e))
 
-        if session_id:
+        if user_logged_in:
             user_id = response.request.meta['user_id']
             variables = '{{"id":"{user_id}","include_reel":true,"fetch_mutual":false,"first":12}}'.format(user_id=user_id)
             params = urlencode([('query_hash', 'c56ee0ae1f89cdbd1c89e2bc6b8f3d18'), ('variables', variables)])
             next_page_url = urljoin(INSTAGRAM_BASE_URL, '/graphql/query/') + '?' + params
             headers = PaginationHeadersManager(response.request.meta['rhx_gis'],
                                                variables).get_headers()
-            return Request(next_page_url, headers=headers, cookies={'sessionid': session_id},
+            return Request(next_page_url, headers=headers,
                            meta=response.request.meta, callback=self.parse_user_following,
                            errback=self.error)
-
 
         return FormRequest(LOGIN_URL, headers=headers, formdata=login_data,
                            meta=response.request.meta, callback=self.after_login,
                            errback=self.error)
+
 
     def after_login(self, response):
         user_id = response.request.meta['user_id']
